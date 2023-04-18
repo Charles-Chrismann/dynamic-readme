@@ -3,10 +3,11 @@ import { Octokit } from 'octokit';
 
 import * as config from '../../config.json';
 import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
+import { ChessService } from 'src/games/chess/chess.service';
 
 @Injectable()
 export class ReadmeService {
-  constructor(private minesweeperService: MinesweeperService) {}
+  constructor(private minesweeperService: MinesweeperService, private chessService: ChessService) {}
 
   render(): string {
     let readMeString = ""
@@ -54,6 +55,7 @@ export class ReadmeService {
     readMeString += `</p>`
     readMeString += `<h1 align="center">Flex Zone</h1>`
     readMeString += this.minesweeperService.toMd()
+    readMeString += this.chessService.toMd()
 
     return readMeString
   }
@@ -63,6 +65,8 @@ export class ReadmeService {
 
         let data = await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)
 
+        const buffer = Buffer.from(this.render());
+        const base64 = buffer.toString('base64');
         await octokit.request(
           `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
           {
@@ -74,7 +78,7 @@ export class ReadmeService {
               name: process.env.OCTO_COMMITTER_NAME,
               email: process.env.OCTO_COMMITTER_EMAIL
             },
-            content: btoa(this.render()),
+            content: base64,
             sha: data.data.sha
           })
     }

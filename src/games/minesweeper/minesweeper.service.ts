@@ -5,6 +5,10 @@ import { Minesweeper } from './classes/Minesweeper';
 export class MinesweeperService {
     minesweeper: Minesweeper
 
+    constructor() {
+      this.minesweeper = new Minesweeper(18, 14, 24)
+    }
+
     new() {
         this.minesweeper = new Minesweeper(18, 14, 24)
     }
