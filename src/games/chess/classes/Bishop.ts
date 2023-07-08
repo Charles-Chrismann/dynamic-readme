@@ -5,7 +5,6 @@ export class Bishop extends Piece {
   type = 'Bishop'
 
   computeLegalMoves(chessInstance, board) {
-    // console.log('computeLegalMoves Bishop')
     this.legalMoves = [];
     // TODO Check discover check
     // TODO Check borders

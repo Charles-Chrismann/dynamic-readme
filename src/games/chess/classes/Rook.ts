@@ -33,7 +33,6 @@ export class Rook extends Piece {
 
     if(chessInstance.simulationState) return
     chessInstance.simulationState = true
-    console.log(this.legalMoves)
     this.legalMoves = utils.filterPin(this.legalMoves, {x: this.x, y: this.y}, board, chessInstance)
     chessInstance.simulationState = false
   }

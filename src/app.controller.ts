@@ -1,12 +1,17 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ReadmeService } from './readme/readme.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly readmeService: ReadmeService,
+    ) {}
 
   @Get()
-  getHello(): string {
+  async getHello(): Promise<string> {
+    await this.readmeService.commit();
     return this.appService.getHello();
   }
 }
