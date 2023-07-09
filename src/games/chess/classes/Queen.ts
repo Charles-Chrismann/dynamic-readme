@@ -3,6 +3,7 @@ import { Piece } from './Piece';
 
 export class Queen extends Piece {
     type = 'Queen'
+    uniqueInitial= 'q';
 
     computeLegalMoves(chessInstance, board) {
       this.legalMoves = [];

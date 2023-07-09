@@ -3,6 +3,7 @@ import { Piece } from './Piece';
 
 export class Pawn extends Piece {
     type = 'Pawn';
+    uniqueInitial = 'p';
     enPassantPossible = false
     moved = false;
 

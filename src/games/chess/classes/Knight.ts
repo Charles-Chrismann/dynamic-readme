@@ -3,6 +3,7 @@ import { utils } from './utils';
 
 export class Knight extends Piece {
     type = 'Knight'
+    uniqueInitial = 'n'
 
     computeLegalMoves(chessInstance, board) {
         this.legalMoves = [];

@@ -3,6 +3,7 @@ import { utils } from './utils'
 
 export class Bishop extends Piece {
   type = 'Bishop'
+  uniqueInitial= 'b';
 
   computeLegalMoves(chessInstance, board) {
     this.legalMoves = [];

@@ -4,6 +4,7 @@ import { utils } from './utils'
 
 export class King extends Piece {
   type = 'King'
+  uniqueInitial = 'k'
   moved = false
 
   computeLegalMoves(chessInstance, board) {
