@@ -81,6 +81,20 @@ export class utils {
         let alphabet = "abcdefgh"
         return `${alphabet[coords.x]}${8 - coords.y}`
     }
+
+    static getletterFromNumber(number) {
+        let numbers = [
+                ":eight:",
+                ":seven:",
+                ":six:",
+                ":five:",
+                ":four:",
+                ":three:",
+                ":two:",
+                ":one:",
+            ]
+        return numbers[number]
+    }
 }
 
 

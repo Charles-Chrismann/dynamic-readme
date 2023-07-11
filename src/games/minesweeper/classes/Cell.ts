@@ -14,7 +14,7 @@ export class Cell {
     }
   
     toEmoji(){
-      let values = [":white_large_square:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":height:", ":boom:"]
+      let values = [":white_large_square:", ":one:", ":two:", ":three:", ":four:", ":five:", ":six:", ":seven:", ":eight:", ":boom:"]
       if(this.hidden) return ":black_large_square:"
       return values[this.value]
     }
