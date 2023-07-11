@@ -78,10 +78,11 @@ export class MinesweeperService {
           str += rowStr + "<br>"
         })
         str += `</p>`
-        if(this.history.length > 1) str += `<p align="center"><img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" /></p>`
         if(this.minesweeper.gameStatus === "Not Started") str += `<p align="center">Come on, try it</p>`
         else if(this.minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>`
         else str += this.minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>` : `<p align="center">Congrats you won !</p>`
+        
+        if(this.history.length > 1) str += `<p align="center"><img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" /></p>`
   
         str += `<h3 align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/new">Reset Game</a></h3>`
     
