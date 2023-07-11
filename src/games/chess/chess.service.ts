@@ -104,7 +104,14 @@ export class ChessService {
         this.renderBoardImage()
         str += `<p align="center"><img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/board.png" /></p>`
 
-        str += `<table align="center"><tbody>`
+        if( this.chess.status === "black" ||
+            this.chess.status === "white"
+            ) str += `<p align="center">${this.chess.status.charAt(0).toUpperCase() + this.chess.status.slice(1)} wins !</p>`
+        else if(this.chess.status === "tie") str += `<p align="center">Stalemate !</p>`
+        else str += `<p align="center">It's ${this.chess.playerTurn.charAt(0).toUpperCase() + this.chess.playerTurn.slice(1)}'s turn</p>`
+
+        if(!this.chess.status) {
+            str += `<table align="center"><tbody>`
             this.chess.board.forEach((row, y) => {
                 str += `<tr><td align="center">${utils.getletterFromNumber(y)}</td>`
                 row.forEach((piece) => {
@@ -113,21 +120,22 @@ export class ChessService {
                 })
                 str += `</tr>`
             })
-        
-        str += 
-            `<tr>
-                <td align="center"></td>
-                <td align="center">🇦</td>
-                <td align="center">🇧</td>
-                <td align="center">🇨</td>
-                <td align="center">🇩</td>
-                <td align="center">🇪</td>
-                <td align="center">🇫</td>
-                <td align="center">🇬</td>
-                <td align="center">🇭</td>
-            </tr></tbody></table>`
+            
+            str += 
+                `<tr>
+                    <td align="center"></td>
+                    <td align="center">🇦</td>
+                    <td align="center">🇧</td>
+                    <td align="center">🇨</td>
+                    <td align="center">🇩</td>
+                    <td align="center">🇪</td>
+                    <td align="center">🇫</td>
+                    <td align="center">🇬</td>
+                    <td align="center">🇭</td>
+                </tr></tbody></table>`
+        }
 
-        str += `<h3 align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/new">Reset Game</a></h3>`
+        str += `<h3 align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/new">Reset Game</a></h3><hr>`
         return str
     }
 }

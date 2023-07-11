@@ -57,6 +57,7 @@ export class utils {
     }
     
     static getPlayerMovesCount(chessInstance) {
+        console.log()
         return  this.getAllPieces(chessInstance.board)
                 .filter(piece => piece.color === chessInstance.playerTurn)
                 .map(piece => piece.legalMoves)

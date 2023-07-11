@@ -98,9 +98,11 @@ export class Chess {
     utils.defineAllLegalMoves(this, this.board);
     
     // game status check
+    console.log(utils.getPlayerMovesCount(this))
     if(utils.getPlayerMovesCount(this) === 0) {
       if(utils.isKingChecked(utils.getKingOfColor(this.playerTurn, this.board), this.board)) this.status = this.playerTurn === 'black' ? 'white' : 'black'
       else this.status = 'pat'
+      console.log(this.status)
     }
   }
 }
