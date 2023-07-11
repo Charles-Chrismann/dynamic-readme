@@ -43,6 +43,7 @@ export class Minesweeper {
         let cell = this.GetCell(click)
         if(!cell) return
         if(cell.value === 9) {
+          this.reavealAllBombs()
           this.gameLoosed = true;// loose
           this.gameStatus = "Ended";// loose
           return
@@ -200,5 +201,9 @@ export class Minesweeper {
         nextCell = this.GetCell(cellCoordsToTest)
         if(nextCell.hidden) this.DiscoverRecursively(nextCell)
       }
+    }
+
+    reavealAllBombs() {
+      this.map.flat().filter(cell => cell.value === 9 && cell.hidden).forEach(cell => cell.revealCell())
     }
 }

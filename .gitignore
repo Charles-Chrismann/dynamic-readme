@@ -5,3 +5,4 @@ dist/
 .env
 config.json
 public/board.png
+public/minesweeper.gif

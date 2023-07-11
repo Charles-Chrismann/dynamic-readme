@@ -48,7 +48,7 @@ export class ChessService {
     }
 
     async renderBoardImage() {
-        const tileSide = 32;
+        const tileSize = 32;
         const buffer = (await (async () => {
             const canvas = createCanvas(256, 256)
             const ctx = canvas.getContext('2d')
@@ -61,26 +61,26 @@ export class ChessService {
             for (let i = 0; i < 8; i++) {
               for (let j = 0; j < 8; j++) {
                 if ((i + j) % 2 === 0) {
-                    ctx.fillRect(tileSide * i, tileSide * j, tileSide, tileSide)
+                    ctx.fillRect(tileSize * i, tileSize * j, tileSize, tileSize)
                 }
 
                 if(j === 7) {
                     currentColor = ctx.fillStyle
                     ctx.fillStyle = i % 2 === 0 ? '#769656' : '#eeeed2'
-                    ctx.fillText(String.fromCharCode(97 + i), tileSide * (i + 1) - 6, 253)
+                    ctx.fillText(String.fromCharCode(97 + i), tileSize * (i + 1) - 6, 253)
                     ctx.fillStyle = currentColor
                 }
               }
               currentColor = ctx.fillStyle
               ctx.fillStyle = i % 2 !== 0 ? '#769656' : '#eeeed2'
-              ctx.fillText(String(8 - i), 1, tileSide * (i + 1) - 24)
+              ctx.fillText(String(8 - i), 1, tileSize * (i + 1) - 24)
               ctx.fillStyle = currentColor
             }
         
             
           
             utils.getAllPieces(this.chess.board).forEach(async piece => {
-                ctx.drawImage(await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png'), piece.x * tileSide, piece.y * tileSide, tileSide, tileSide)
+                ctx.drawImage(await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png'), piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
             })
         
             return canvas
