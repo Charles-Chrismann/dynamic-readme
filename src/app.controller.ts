@@ -11,7 +11,6 @@ export class AppController {
 
   @Get()
   async getHello(): Promise<string> {
-    await this.readmeService.commit();
     return this.appService.getHello();
   }
 }
