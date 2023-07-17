@@ -16,7 +16,11 @@
         "firstname": "Charles",
         "lastname": "Chrismann",
         "description": [
-          "<p>I'm a french student in 2nd year in web development at <a href=\"https://www.iim.fr\" target=\"_blank\" rel=\"noreferrer\" title=\"Institut de l'Internet et du Multimédia\">IIM DigitalSchool</a> in Paris.</p>"
+          "I'm a french student in 2nd year in web development at <a href=\"https://www.iim.fr\" target=\"_blank\" rel=\"noreferrer\" title=\"Institut de l'Internet et du Multimédia\">IIM DigitalSchool</a> in Paris.",
+          [
+            "My list item #1",
+            "My list item #2"
+          ]
         ],
         "socials": [
           {

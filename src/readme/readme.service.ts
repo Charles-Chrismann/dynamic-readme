@@ -18,9 +18,10 @@ export class ReadmeService {
 
     readMeString += `<h1>:wave: - Hi visitor</h1>`;
     readMeString += `<h3>I'm ${config.datas.perso.firstname} ${config.datas.perso.lastname} !</h3>`;
-    config.datas.perso.description.forEach((line: string) => {
-      readMeString += line;
-    })
+    readMeString += config.datas.perso.description.map((line: string | string[]) => 
+      typeof line === "string" ? `<p>${line}</p>` : `<ul>${line.map((item: string) => `<li>${item}</li>`).join('')}</ul>`
+    ).join('');
+
     if (config.datas.perso.socials.length > 0) {
       readMeString += `<h1 align="left">Reach Me</h1>`;
       readMeString += `<p align="left">`;
