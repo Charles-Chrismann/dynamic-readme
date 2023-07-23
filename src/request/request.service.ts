@@ -4,7 +4,12 @@ import axios from 'axios';
 
 @Injectable()
 export class RequestService {
-    public lastFollowers: any[] = []
+    public lastFollowers: {followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]} = {followerCount: 0, lastFollowers: []}
+
+    constructor() {
+        this.getFollowers(3).then((followers) => {
+            this.lastFollowers = followers
+    })}
 
     async getFollowers(limit: number): Promise<{followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]}> {
         try {
