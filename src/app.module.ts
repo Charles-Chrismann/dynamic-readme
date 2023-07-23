@@ -9,6 +9,7 @@ import { ReadmeModule } from './readme/readme.module';
 import { ConfigModule } from '@nestjs/config';
 import { TriggerModule } from './trigger/trigger.module';
 import { ReadmeService } from './readme/readme.service';
+import { RequestModule } from './request/request.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReadmeService } from './readme/readme.service';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'public'),
     }),
+    RequestModule,
   ],
   controllers: [AppController],
   providers: [AppService, ReadmeService],
