@@ -93,13 +93,14 @@ export class ReadmeService {
 
     readMeString += `<h1 align="center">Work in progress</h1>`;
     readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>`;
+    readMeString += `<p align="center">To understand how it works, take a look <a href="https://github.com/Charles-Chrismann/dynamic-readme" target="_blank" rel="noreferrer" title="github dynalic readme">here</a></p>`;
     readMeString += `<p align="center"><img align="center" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/trigger" alt="work in progress" width="256" /></p>`;
     readMeString += `<p align="center"><a href="https://github.com/${config.datas.repo.owner}">See ya <3</a></p>`;
     let currentDate = new Date();
     const days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     const months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" , "Oct", "Nov", "Dec"]
-    readMeString += `<p align="right">Generated in: ${(Date.now() - this.startDateRender) / 1000}s on ${days[currentDate.getDay()]} ${months[currentDate.getMonth()]} ${currentDate.getDate()} at ${currentDate.getHours()}:${currentDate.getMinutes().toString().padStart(2, '0')}</p>`;
-
+    readMeString += `<p align="right">Generated in ${(Date.now() - this.startDateRender) / 1000}s on ${days[currentDate.getDay()]} ${months[currentDate.getMonth()]} ${currentDate.getDate()} at ${currentDate.getHours()}:${currentDate.getMinutes().toString().padStart(2, '0')}</p>`;
+    
     return readMeString;
   }
 
