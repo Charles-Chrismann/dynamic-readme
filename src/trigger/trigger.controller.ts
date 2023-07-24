@@ -1,6 +1,6 @@
+import { join } from 'path';
 import { Controller, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
-import { join } from 'path';
 import { ReadmeService } from 'src/readme/readme.service';
 import { RequestService } from 'src/request/request.service';
 

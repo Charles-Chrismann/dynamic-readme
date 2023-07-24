@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import { createCanvas } from 'canvas';
 const GIFEncoder = require('gifencoder');
-
 import { Injectable } from '@nestjs/common';
 import { Minesweeper } from './classes/Minesweeper';
 

@@ -1,9 +1,8 @@
-import { Controller, Get, Query, Redirect, Res } from '@nestjs/common';
-
+import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 import * as config from '../../../config.json';
 import { MinesweeperService } from './minesweeper.service';
 import { ReadmeService } from 'src/readme/readme.service';
-import { Response } from 'express';
 
 @Controller('minesweeper')
 export class MinesweeperController {

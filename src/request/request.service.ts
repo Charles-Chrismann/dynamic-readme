@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import * as config from '../../config.json';
 import axios from 'axios';
+import * as config from '../../config.json';
 
 @Injectable()
 export class RequestService {

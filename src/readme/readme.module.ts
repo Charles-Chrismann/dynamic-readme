@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ReadmeService } from './readme.service';
-import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
-import { ChessService } from 'src/games/chess/chess.service';
-import { RequestService } from 'src/request/request.service';
+import { GamesModule } from 'src/games/games.module';
+import { RequestModule } from 'src/request/request.module';
 
 @Module({
-  providers: [ReadmeService, RequestService, MinesweeperService, ChessService]
+  imports: [forwardRef(() => GamesModule), RequestModule],
+  providers: [ReadmeService],
+  exports: [ReadmeService]
 })
 export class ReadmeModule {}

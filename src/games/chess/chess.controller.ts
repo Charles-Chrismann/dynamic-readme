@@ -1,7 +1,6 @@
-import { Controller, Get, Query, Request, Res } from '@nestjs/common';
+import { Controller, Get, Request, Res } from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { Response } from 'express'
-
 import * as config from '../../../config.json';
 import { ReadmeService } from 'src/readme/readme.service';
 

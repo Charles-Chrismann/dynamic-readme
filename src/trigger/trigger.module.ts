@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TriggerController } from './trigger.controller';
-import { ReadmeService } from 'src/readme/readme.service';
-import { RequestService } from 'src/request/request.service';
-import { GamesModule } from 'src/games/games.module';
+import { ReadmeModule } from 'src/readme/readme.module';
+import { RequestModule } from 'src/request/request.module';
 
 @Module({
-  imports: [GamesModule],
+  imports: [ReadmeModule, RequestModule],
   controllers: [TriggerController],
-  providers: [ReadmeService, RequestService],
 })
 export class TriggerModule {}

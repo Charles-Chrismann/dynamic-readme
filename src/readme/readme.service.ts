@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Octokit } from 'octokit';
-
 import * as config from '../../config.json';
 import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
 import { ChessService } from 'src/games/chess/chess.service';
