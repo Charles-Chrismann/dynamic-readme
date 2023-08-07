@@ -9,6 +9,7 @@ import { ReadmeModule } from './readme/readme.module';
 import { TriggerModule } from './trigger/trigger.module';
 import { ReadmeService } from './readme/readme.service';
 import { RequestModule } from './request/request.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RequestModule } from './request/request.module';
       rootPath: join(__dirname, '..', '..', 'public'),
     }),
     RequestModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService, ReadmeService],

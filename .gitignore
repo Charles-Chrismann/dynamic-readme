@@ -4,5 +4,6 @@ node_modules/
 dist/
 .env
 config.json
+serviceAccountKey.json
 public/board.png
 public/minesweeper.gif

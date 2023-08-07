@@ -4,11 +4,14 @@ import { MinesweeperController } from './minesweeper/minesweeper.controller';
 import { ChessService } from './chess/chess.service';
 import { ChessController } from './chess/chess.controller';
 import { ReadmeModule } from 'src/readme/readme.module';
+import { WordleService } from './wordle/wordle.service';
+import { WordleModule } from './wordle/wordle.module';
+import { WordleController } from './wordle/wordle.controller';
 
 @Module({
   imports: [forwardRef(() => ReadmeModule)],
-  controllers: [MinesweeperController, ChessController],
-  providers: [MinesweeperService, ChessService],
-  exports: [MinesweeperService, ChessService]
+  controllers: [MinesweeperController, ChessController, WordleController],
+  providers: [MinesweeperService, ChessService, WordleService],
+  exports: [MinesweeperService, ChessService, WordleService]
 })
 export class GamesModule {}

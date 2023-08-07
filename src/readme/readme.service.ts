@@ -4,6 +4,7 @@ import * as config from '../../config.json';
 import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
 import { ChessService } from 'src/games/chess/chess.service';
 import { RequestService } from 'src/request/request.service';
+import { WordleService } from 'src/games/wordle/wordle.service';
 
 @Injectable()
 export class ReadmeService {
@@ -14,6 +15,7 @@ export class ReadmeService {
     private requestService: RequestService,
     private minesweeperService: MinesweeperService,
     private chessService: ChessService,
+    private wordleService: WordleService,
   ) {
     this.currentContentSha = null;
   }
@@ -90,6 +92,7 @@ export class ReadmeService {
     readMeString += `<h1 align="center">Flex Zone</h1>`;
     readMeString += this.minesweeperService.toMd();
     readMeString += this.chessService.toMd();
+    readMeString += this.wordleService.toMd();
 
     readMeString += `<h1 align="center">Work in progress</h1>`;
     readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>`;
