@@ -32,7 +32,7 @@ export class ReadmeService {
     return returnString
   }
 
-  private async render(): Promise<string> {
+  private render(): string {
     let readMeString = '';
     let skills = config.skills;
 
@@ -118,7 +118,7 @@ export class ReadmeService {
       )).data.sha;
     }
 
-    const buffer = Buffer.from(await this.render());
+    const buffer = Buffer.from(this.render());
     const base64 = buffer.toString('base64');
     // return
     let pushResp = await octokit.request(

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
 import { WordleService } from './wordle.service';
 import { Response } from 'express';
 import * as config from 'config.json';
@@ -11,17 +11,25 @@ export class WordleController {
     @Get('wordle')
     async wordle() {
         await this.wordleService.wordle();
+        await this.readmeService.commit()
         return 'wordle';
     }
 
     @Post('guess')
-    async guess(@Res() res: Response, @Body('guess') guess: string, @Body('GH_ACTION_TRUST') GH_ACTION_TRUST: string, @Body('issuer') issuer: string) {
-        if(GH_ACTION_TRUST !== process.env.GH_ACTION_TRUST) return
-        if(!guess || guess.length !== 5) return
-        if(!issuer) return
-        
-        await this.wordleService.guess(guess, issuer);
-        // await this.readmeService.commit()
+    async guess(
+        @Res() res: Response,
+        @Body('guess') guess: string,
+        @Body('GH_ACTION_TRUST') GH_ACTION_TRUST: string,
+        @Body('issuer') issuer: string,
+        @Body('issuerId') issuerId: number
+    ) {
+        if(GH_ACTION_TRUST !== process.env.GH_ACTION_TRUST) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+        if(!guess || guess.length !== 5) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+        if(!issuer) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+        if(!issuerId) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+
+        await this.wordleService.guess(guess, issuer, issuerId);
+        await this.readmeService.commit()
         res.redirect(200, config.datas.repo.url + "#a-classic-wordle");
     }
 }
