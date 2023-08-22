@@ -86,7 +86,7 @@ export class WordleService {
     toMd(): string {
         let str = `<h3 align="center">A classic Wordle</h3>`
         str += `<table align="center"><thead><tr><th colspan="5">Wordle</th><th>Player</th></tr></thead><tbody>`
-        str += this.todayWordle.guesses.map(guess => `<tr>${guess.guess.map(letter => `<td>${letter.status === 'correct' ? `$\\text{\\color{lightgreen}{${letter.letter.toUpperCase()}}}$` : (letter.status === 'present' ? `$\\text{\\color{orange}{${letter.letter.toUpperCase()}}}$` : `$\\text{\\color{white}{${letter.letter.toUpperCase()}}}$`)}</td>`).join('')}<td><a href="https://github.com/${guess.username}">@${guess.username}</a></td></tr>`)
+        str += this.todayWordle.guesses.map(guess => `<tr>${guess.guess.map(letter => `<td>${letter.status === 'correct' ? `$\\text{\\color{lightgreen}{${letter.letter.toUpperCase()}}}$` : (letter.status === 'present' ? `$\\text{\\color{orange}{${letter.letter.toUpperCase()}}}$` : `$\\text{\\color{white}{${letter.letter.toUpperCase()}}}$`)}</td>`).join('')}<td><a href="https://github.com/${guess.username}">@${guess.username}</a></td></tr>`).join('')
 
         str += `<tr><td>‎ </td><td>‎ </td><td>‎ </td><td>‎ </td><td>‎ </td><td><a href="${config.datas.repo.url.endsWith('/') ? config.datas.repo.url.slice(0, -1) : config.datas.repo.url}/issues/new?body=Please+only+add+your+word+to+the+title.+Just+click+%22Submit+new+issue%22.+You+don%27t+need+to+do+anything+else+%3AD&title=Wordle%3A+"><s>Submit a word</s> (Not working wait until ~ 15/08)</a></td></tr>`
         str += `</tbody></table>`

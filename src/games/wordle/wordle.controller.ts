@@ -1,6 +1,6 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res } from '@nestjs/common';
 import { WordleService } from './wordle.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import * as config from 'config.json';
 import { ReadmeService } from 'src/readme/readme.service';
 
@@ -21,12 +21,15 @@ export class WordleController {
         @Body('guess') guess: string,
         @Body('GH_ACTION_TRUST') GH_ACTION_TRUST: string,
         @Body('issuer') issuer: string,
-        @Body('issuerId') issuerId: number
+        @Body('issuerId') issuerId: number,
+        @Req() req: Request
     ) {
+        console.log(req)
         if(GH_ACTION_TRUST !== process.env.GH_ACTION_TRUST) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         if(!guess || guess.length !== 5) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         if(!issuer) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
         if(!issuerId) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+        console.log('passed')
 
         await this.wordleService.guess(guess, issuer, issuerId);
         await this.readmeService.commit()
