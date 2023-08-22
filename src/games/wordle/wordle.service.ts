@@ -84,6 +84,7 @@ export class WordleService {
 
 
     toMd(): string {
+        if(!this.todayWordle || !this.scoreBoard) return ''
         let str = `<h3 align="center">A classic Wordle</h3>`
         str += `<table align="center"><thead><tr><th colspan="5">Wordle</th><th>Player</th></tr></thead><tbody>`
         str += this.todayWordle.guesses.map(guess => `<tr>${guess.guess.map(letter => `<td>${letter.status === 'correct' ? `$\\text{\\color{lightgreen}{${letter.letter.toUpperCase()}}}$` : (letter.status === 'present' ? `$\\text{\\color{orange}{${letter.letter.toUpperCase()}}}$` : `$\\text{\\color{white}{${letter.letter.toUpperCase()}}}$`)}</td>`).join('')}<td><a href="https://github.com/${guess.username}">@${guess.username}</a></td></tr>`).join('')
