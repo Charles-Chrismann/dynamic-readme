@@ -21,9 +21,10 @@ export class WordleService {
             guesses: number
         }[]
     }
-    constructor(private readonly firebaseService: FirebaseService) {}
+    constructor(
+        private readonly firebaseService: FirebaseService,
+    ) {}
 
-    // scheduled
     async wordle() {
         const word = five_char_words[Math.floor(Math.random() * five_char_words.length)]
         const wordle = {

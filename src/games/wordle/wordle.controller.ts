@@ -3,6 +3,7 @@ import { WordleService } from './wordle.service';
 import { Request, Response } from 'express';
 import * as config from 'config.json';
 import { ReadmeService } from 'src/readme/readme.service';
+import { Cron } from '@nestjs/schedule';
 
 @Controller('wordle')
 export class WordleController {
@@ -13,6 +14,11 @@ export class WordleController {
         await this.wordleService.wordle();
         await this.readmeService.commit()
         return 'wordle';
+    }
+
+    @Cron('0 0 22 * * *')
+    async wordleAndCommit() {
+        await this.wordleService.wordle();
     }
 
     @Post('guess')

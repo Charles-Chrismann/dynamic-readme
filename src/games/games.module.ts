@@ -5,7 +5,6 @@ import { ChessService } from './chess/chess.service';
 import { ChessController } from './chess/chess.controller';
 import { ReadmeModule } from 'src/readme/readme.module';
 import { WordleService } from './wordle/wordle.service';
-import { WordleModule } from './wordle/wordle.module';
 import { WordleController } from './wordle/wordle.controller';
 
 @Module({

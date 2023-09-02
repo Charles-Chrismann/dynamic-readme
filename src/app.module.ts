@@ -9,9 +9,12 @@ import { TriggerModule } from './trigger/trigger.module';
 import { ReadmeService } from './readme/readme.service';
 import { RequestModule } from './request/request.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     GamesModule,
     ReadmeModule,
     TriggerModule,
@@ -19,7 +22,7 @@ import { FirebaseModule } from './firebase/firebase.module';
       rootPath: join(__dirname, '..', '..', 'public'),
     }),
     RequestModule,
-    FirebaseModule,
+    FirebaseModule
   ],
   controllers: [AppController],
   providers: [AppService, ReadmeService],
