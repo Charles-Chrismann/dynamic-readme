@@ -1,7 +1,6 @@
 import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GamesModule } from './games/games.module';
@@ -13,7 +12,6 @@ import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
     GamesModule,
     ReadmeModule,
     TriggerModule,

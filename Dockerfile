@@ -1,10 +1,10 @@
-FROM node:16
+FROM node:16-alpine
 
 WORKDIR /app
 
 COPY package.json ./
 
-RUN npm install
+RUN npm install --silent
 
 COPY . .
 
