@@ -90,52 +90,38 @@ export class ChessService {
     }
 
     private computeMoveString(piece: Piece) {
-        let str = ""
         const sqrt = Math.ceil(Math.sqrt(piece.legalMoves.length))
-        piece.legalMoves.forEach((move, index: number) => {
-            if(index % sqrt === 0 && index !== 0) str += "<br>"
-            str += `<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/move?x1=${piece.x}&y1=${piece.y}&x2=${move.x}&y2=${move.y}">${utils.coordsToBoardCoards({x: move.x, y: move.y})}</a> `
-        })
-        return str
+        return piece.legalMoves.map((move, index: number) => {
+            return `${(index % sqrt === 0 && index !== 0) ? "<br>" : ''}<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/move?x1=${piece.x}&y1=${piece.y}&x2=${move.x}&y2=${move.y}">${utils.coordsToBoardCoards({x: move.x, y: move.y})}</a>`
+        }).join('\n          ')
     }
 
     toMd() {
-        let str = `<h3 align="center">A classic Chess</h3>`
+        let str = `<h3 align="center">A classic Chess</h3>\n`
         this.renderBoardImage()
-        str += `<p align="center"><img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/board.png" /></p>`
+        str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/board.png" />\n</p>\n`
 
         if( this.chess.status === "black" ||
             this.chess.status === "white"
-            ) str += `<p align="center">${this.chess.status.charAt(0).toUpperCase() + this.chess.status.slice(1)} wins !</p>`
-        else if(this.chess.status === "tie") str += `<p align="center">Stalemate !</p>`
-        else str += `<p align="center">It's ${this.chess.playerTurn.charAt(0).toUpperCase() + this.chess.playerTurn.slice(1)}'s turn</p>`
+            ) str += `<p align="center">${this.chess.status.charAt(0).toUpperCase() + this.chess.status.slice(1)} wins !</p>\n`
+        else if(this.chess.status === "tie") str += `<p align="center">Stalemate !</p>\n`
+        else str += `<p align="center">It's ${this.chess.playerTurn.charAt(0).toUpperCase() + this.chess.playerTurn.slice(1)}'s turn</p>\n`
 
         if(!this.chess.status) {
-            str += `<table align="center"><tbody>`
+            str += `<table align="center">\n  <tbody>\n`
             this.chess.board.forEach((row, y) => {
-                str += `<tr><td align="center">${utils.getletterFromNumber(y)}</td>`
+                str += `    <tr>\n      <td align="center">${utils.getletterFromNumber(y)}</td>\n`
                 row.forEach((piece) => {
-                    str += `<td align="center">${piece ? (piece.legalMoves.length && piece.color === this.chess.playerTurn ? `<details><summary>${this.pieces[piece.type][piece.color]}</summary>${this.computeMoveString(piece)}</details>` : this.pieces[piece.type][piece.color]
-                ): "‎ "}</td>`
+                    str += `      <td align="center">${piece ? (piece.legalMoves.length && piece.color === this.chess.playerTurn ? `\n        <details>\n          <summary>${this.pieces[piece.type][piece.color]}</summary>\n          ${this.computeMoveString(piece)}\n        </details>\n` : this.pieces[piece.type][piece.color]
+                ): "‎ "}      </td>\n`
                 })
-                str += `</tr>`
+                str += `    </tr>\n`
             })
             
-            str += 
-                `<tr>
-                    <td align="center"></td>
-                    <td align="center">🇦</td>
-                    <td align="center">🇧</td>
-                    <td align="center">🇨</td>
-                    <td align="center">🇩</td>
-                    <td align="center">🇪</td>
-                    <td align="center">🇫</td>
-                    <td align="center">🇬</td>
-                    <td align="center">🇭</td>
-                </tr></tbody></table>`
+            str +=  `  <tr>\n    <td align="center"></td>\n    <td align="center">🇦</td>\n    <td align="center">🇧</td>\n    <td align="center">🇨</td>\n    <td align="center">🇩</td>\n    <td align="center">🇪</td>\n    <td align="center">🇫</td>\n    <td align="center">🇬</td>\n    <td align="center">🇭</td>\n    </tr>\n  </tbody>\n</table>`
         }
 
-        str += `<h3 align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/new">Reset Game</a></h3><hr>`
+        str += `<h3 align="center">\n<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
         return str
     }
 }

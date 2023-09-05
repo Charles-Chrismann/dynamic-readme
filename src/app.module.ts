@@ -14,6 +14,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ScheduleModule.forRoot(),
     GamesModule,
     ReadmeModule,

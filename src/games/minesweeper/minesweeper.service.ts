@@ -67,23 +67,17 @@ export class MinesweeperService {
 
     toMd() {
       this.generatehistoryGif()
-        let str = `<h3 align="center">A classic Minesweeper</h3>`
-        str += `<p align="center">`
-        this.minesweeper.map.forEach(row => {
-          let rowStr = ""
-          row.forEach(cell => {
-            rowStr += cell.hidden ? `<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>` : `<span>${cell.toEmoji()}</span>`
-          })
-          str += rowStr + "<br>"
-        })
-        str += `</p>`
-        if(this.minesweeper.gameStatus === "Not Started") str += `<p align="center">Come on, try it</p>`
-        else if(this.minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>`
-        else str += this.minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>` : `<p align="center">Congrats you won !</p>`
+        let str = `<h3 align="center">A classic Minesweeper</h3>\n`
+        str += `<p align="center">\n`
+        str += this.minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
+        str += `</p>\n`
+        if(this.minesweeper.gameStatus === "Not Started") str += `<p align="center">Come on, try it</p>\n`
+        else if(this.minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>\n`
+        else str += this.minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>\n` : `<p align="center">Congrats you won !</p>\n`
         
-        if(this.history.length > 1) str += `<p align="center"><img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" /></p>`
+        if(this.history.length > 1) str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" />\n</p>`
   
-        str += `<h3 align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/new">Reset Game</a></h3><hr>`
+        str += `<h3 align="center">\n  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
     
         return str
       }

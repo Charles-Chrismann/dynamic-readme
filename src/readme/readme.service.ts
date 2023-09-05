@@ -23,12 +23,12 @@ export class ReadmeService {
   renderFollowersTable(): string {
     let followers = this.requestService.lastFollowers;
     let returnString = '';
-    returnString += `<table align="center"><thead><tr><th colspan="3" width="512">Last Followers</th></tr></thead><tbody>`;
-    JSON.parse(JSON.stringify(followers.lastFollowers)).reverse().forEach((follower, index) => {
-      returnString += `<tr><td align="center">${followers.followerCount - (followers.lastFollowers.length - index - 1)}</td><td align="center"><a href="https://github.com/${follower.login}" target="_blank"><img src="${follower.avatarUrl}" alt="${follower.login}" width="40" height="40"/></a></td><td><a href="https://github.com/${follower.login}" target="_blank">${follower.login}</a></td></tr>`;
-    });
-    returnString += `<tr><td align="center">${followers.followerCount + 1}</td><td align="center" colspan="2">Maybe You ? (can take a few minutes to update)</td></tr>`;
-    returnString += `</tbody></table>`;
+    returnString += `<table align="center">\n  <thead>\n    <tr>\n      <th colspan="3" width="512">Last Followers</th>\n    </tr>\n  </thead>\n  <tbody>\n`;
+    returnString += JSON.parse(JSON.stringify(followers.lastFollowers)).reverse().map((follower, index) => {
+      return `    <tr>\n      <td align="center">${followers.followerCount - (followers.lastFollowers.length - index - 1)}</td>\n      <td align="center">\n        <a href="https://github.com/${follower.login}" target="_blank">\n          <img src="${follower.avatarUrl}" alt="${follower.login}" width="40" height="40"/>\n        </a>\n      </td>\n      <td>\n        <a href="https://github.com/${follower.login}" target="_blank">${follower.login}</a>\n      </td>\n    </tr>\n`;
+    }).join('');
+    returnString += `    <tr>\n      <td align="center">${followers.followerCount + 1}</td>\n      <td align="center" colspan="2">Maybe You ? (can take a few minutes to update)</td>\n    </tr>`;
+    returnString += `\n  </tbody>\n</table>\n`;
     return returnString
   }
 
@@ -36,78 +36,78 @@ export class ReadmeService {
     let readMeString = '';
     let skills = config.skills;
 
-    readMeString += `<h1>:wave: - Hi visitor</h1>`;
-    readMeString += `<h3>I'm ${config.datas.perso.firstname} ${config.datas.perso.lastname} !</h3>`;
+    readMeString += `<h1>:wave: - Hi visitor</h1>\n`;
+    readMeString += `<h3>I'm ${config.datas.perso.firstname} ${config.datas.perso.lastname} !</h3>\n`;
     readMeString += config.datas.perso.description.map((line: string | string[]) => 
-      typeof line === "string" ? `<p>${line}</p>` : `<ul>${line.map((item: string) => `<li>${item}</li>`).join('')}</ul>`
+      typeof line === "string" ? `<p>${line}</p>\n` : `<ul>\n${line.map((item: string) => `  <li>${item}</li>\n`).join('')}</ul>\n`
     ).join('');
 
     readMeString += this.renderFollowersTable()
 
     if (config.datas.perso.socials.length > 0) {
-      readMeString += `<h1 align="left">Reach Me</h1>`;
-      readMeString += `<p align="left">`;
-      config.datas.perso.socials.forEach((social) => {
-        readMeString += `<a href="${social.profile_url}" target="blank"><img align="center" src="${social.icon_url}" alt="${social.name}" height="30" width="40" /></a>`;
-      });
-      readMeString += `</p>`;
+      readMeString += `<h1 align="left">Reach Me</h1>\n`;
+      readMeString += `<p align="left">\n`;
+      readMeString += config.datas.perso.socials.map((social) => {
+        return `  <a href="${social.profile_url}" target="blank">\n    <img align="center" src="${social.icon_url}" alt="${social.name}" height="30" width="40" />\n  </a>\n`;
+      }).join('');
+      readMeString += `</p>\n`;
     }
-    readMeString += `<h1 align="center">Technical skills</h1>`;
+    readMeString += `<h1 align="center">Technical skills</h1>\n`;
 
     if(config.skills.learning) {
-      readMeString += `<h3 align="left">Currently learning: `;
-      skills.learning.forEach((skill) => {
-        readMeString += `<a href="${skill.url}" target="_blank" rel="noreferrer"><img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/></a> `;
-      });
-      readMeString += `</h3>`;
+      readMeString += `<h3 align="left">Currently learning:\n`;
+      readMeString += skills.learning.map((skill) => {
+        return `  <a href="${skill.url}" target="_blank" rel="noreferrer">\n    <img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/>\n  </a>\n`;
+      }).join('');
+      readMeString += `</h3>\n`;
     }
 
     // Front
-    readMeString += `<h3>Front-end technologies</h3><p align="left">`;
-    skills.front.forEach((skill) => {
-      readMeString += `<a href="${skill.url}" target="_blank" rel="noreferrer"><img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/></a> `;
-    });
-    readMeString += `</p>`;
+    readMeString += `<h3>Front-end technologies</h3>\n<p align="left">\n`;
+    readMeString += skills.front.map((skill) => {
+      return `  <a href="${skill.url}" target="_blank" rel="noreferrer">\n    <img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/>\n  </a>\n`;
+    }).join('');
+    readMeString += `</p>\n`;
 
     // Back
-    readMeString += `<h3>Back-end technologies</h3><p align="left">`;
-    skills.back.forEach((skill) => {
-      readMeString += `<a href="${skill.url}" target="_blank" rel="noreferrer"><img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/></a> `;
-    });
-    readMeString += `</p>`;
+    readMeString += `<h3>Back-end technologies</h3>\n<p align="left">\n`;
+    readMeString += skills.back.map((skill) => {
+      return `  <a href="${skill.url}" target="_blank" rel="noreferrer">\n    <img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/>\n  </a>\n`;
+    }).join('');
+    readMeString += `</p>\n`;
 
     // Notions
-    readMeString += `<h3>Other technologies where I have notions</h3><p align="left">`;
-    skills.notions.forEach((skill) => {
-      readMeString += `<a href="${skill.url}" target="_blank" rel="noreferrer"><img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/></a> `;
-    });
-    readMeString += `</p>`;
+    readMeString += `<h3>Other technologies where I have notions</h3>\n<p align="left">\n`;
+    readMeString += skills.notions.map((skill) => {
+      return `  <a href="${skill.url}" target="_blank" rel="noreferrer">\n    <img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/>\n  </a>\n`;
+    }).join('');
+    readMeString += `</p>\n`;
 
     // Tools
-    readMeString += `<h3>Tools</h3><p align="left">`;
-    skills.tools.forEach((skill) => {
-      readMeString += `<a href="${skill.url}" target="_blank" rel="noreferrer"><img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/></a> `;
-    });
-    readMeString += `</p>`;
-    readMeString += `<h1 align="center">Flex Zone</h1>`;
+    readMeString += `<h3>Tools</h3>\n<p align="left">\n`;
+    readMeString += skills.tools.map((skill) => {
+      return `  <a href="${skill.url}" target="_blank" rel="noreferrer">\n    <img src="${skill.src}" alt="${skill.alt}" width="40" height="40"/>\n  </a>\n`;
+    }).join('');
+    readMeString += `</p>\n`;
+    readMeString += `<h1 align="center">Flex Zone</h1>\n`;
     readMeString += this.minesweeperService.toMd();
     readMeString += this.chessService.toMd();
     readMeString += this.wordleService.toMd();
 
-    readMeString += `<h1 align="center">Work in progress</h1>`;
-    readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>`;
-    readMeString += `<p align="center">To understand how it works, take a look <a href="https://github.com/Charles-Chrismann/dynamic-readme" target="_blank" rel="noreferrer" title="github dynalic readme">here</a></p>`;
-    readMeString += `<p align="center"><img align="center" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/trigger" alt="work in progress" width="256" /></p>`;
-    readMeString += `<p align="center"><a href="https://github.com/${config.datas.repo.owner}">See ya <3</a></p>`;
+    readMeString += `<h1 align="center">Work in progress</h1>\n`;
+    readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>\n`;
+    readMeString += `<p align="center">To understand how it works, take a look <a href="https://github.com/Charles-Chrismann/dynamic-readme" target="_blank" rel="noreferrer" title="github dynalic readme">here</a></p>\n`;
+    readMeString += `<p align="center">\n  <img align="center" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/trigger" alt="work in progress" width="256" />\n</p>\n`;
+    readMeString += `<p align="center">\n  <a href="https://github.com/${config.datas.repo.owner}">See ya <3</a>\n</p>\n`;
     let currentDate = new Date();
     const days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     const months = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep" , "Oct", "Nov", "Dec"]
-    readMeString += `<p align="right">Generated in ${(Date.now() - this.startDateRender) / 1000}s on ${days[currentDate.getDay()]} ${months[currentDate.getMonth()]} ${currentDate.getDate()} at ${currentDate.getHours()}:${currentDate.getMinutes().toString().padStart(2, '0')}</p>`;
+    readMeString += `<p align="right">Generated in ${(Date.now() - this.startDateRender) / 1000}s on ${days[currentDate.getDay()]} ${months[currentDate.getMonth()]} ${currentDate.getDate()} at ${currentDate.getHours()}:${currentDate.getMinutes().toString().padStart(2, '0')}</p>\n`;
     
     return readMeString;
   }
 
-  async commit() {
+  async commit(commitMessage?: string) {
     this.startDateRender = Date.now();
     const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 
@@ -126,7 +126,7 @@ export class ReadmeService {
         owner: config.datas.repo.owner,
         repo: config.datas.repo.name,
         path: config.datas.repo.readme.path,
-        message: config.datas.repo.commit.message,
+        message: 'commitMessage',
         committer: {
           name: process.env.OCTO_COMMITTER_NAME,
           email: process.env.OCTO_COMMITTER_EMAIL,
