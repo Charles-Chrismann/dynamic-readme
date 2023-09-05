@@ -17,7 +17,7 @@ export class TriggerController {
         this.requestService.getFollowers(3).then((followers) => {
             if(JSON.stringify(followers) !== JSON.stringify(this.requestService.lastFollowers)) {
                 this.requestService.lastFollowers = followers
-                this.readMeService.commit()
+                this.readMeService.commit(':alarm_clock: Update followers table')
             }
         })
         return res.sendFile(join(process.cwd(), 'public/trigger.webp'))

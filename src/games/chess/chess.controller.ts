@@ -10,7 +10,7 @@ export class ChessController {
     @Get('new')
     async new(@Res() res: Response) {
         this.chessService.new()
-        await this.readmeService.commit()
+        await this.readmeService.commit(':chess_pawn: Reset chess')
         res.status(200)
         res.redirect(config.datas.repo.url + '#a-classic-chess')
     }
@@ -18,7 +18,7 @@ export class ChessController {
     @Get('move')
     async move(@Res() res: Response, @Request() req) {
         this.chessService.move(req)
-        await this.readmeService.commit()
+        await this.readmeService.commit(':chess_pawn: Update chess')
         res.status(200)
         res.redirect(config.datas.repo.url + '#a-classic-chess')
     }

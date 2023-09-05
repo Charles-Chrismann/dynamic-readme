@@ -12,13 +12,13 @@ export class WordleController {
     @Get('wordle')
     async wordle() {
         await this.wordleService.wordle();
-        await this.readmeService.commit()
+        await this.readmeService.commit(':book: set today\'s wordle')
         return 'wordle';
     }
 
     @Cron('0 0 22 * * *')
     async wordleAndCommit() {
-        await this.wordleService.wordle();
+        await this.wordle();
     }
 
     @Post('guess')
@@ -37,7 +37,7 @@ export class WordleController {
         console.log('passed')
 
         await this.wordleService.guess(guess, issuer, issuerId);
-        await this.readmeService.commit()
+        await this.readmeService.commit(':book: Update wordle')
         res.redirect(200, config.datas.repo.url + "#a-classic-wordle");
     }
 }

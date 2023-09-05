@@ -107,7 +107,7 @@ export class ReadmeService {
     return readMeString;
   }
 
-  async commit(commitMessage?: string) {
+  async commit(commitMessage: string) {
     this.startDateRender = Date.now();
     const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 
