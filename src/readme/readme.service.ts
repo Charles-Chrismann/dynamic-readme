@@ -126,7 +126,7 @@ export class ReadmeService {
         owner: config.datas.repo.owner,
         repo: config.datas.repo.name,
         path: config.datas.repo.readme.path,
-        message: 'commitMessage',
+        message: commitMessage,
         committer: {
           name: process.env.OCTO_COMMITTER_NAME,
           email: process.env.OCTO_COMMITTER_EMAIL,
