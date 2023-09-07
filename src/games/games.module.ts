@@ -6,9 +6,10 @@ import { ChessController } from './chess/chess.controller';
 import { ReadmeModule } from 'src/readme/readme.module';
 import { WordleService } from './wordle/wordle.service';
 import { WordleController } from './wordle/wordle.controller';
+import { SudokuModule } from './sudoku/sudoku.module';
 
 @Module({
-  imports: [forwardRef(() => ReadmeModule)],
+  imports: [forwardRef(() => ReadmeModule), SudokuModule],
   controllers: [MinesweeperController, ChessController, WordleController],
   providers: [MinesweeperService, ChessService, WordleService],
   exports: [MinesweeperService, ChessService, WordleService]
