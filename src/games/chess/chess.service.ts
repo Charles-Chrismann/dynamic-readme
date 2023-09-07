@@ -44,8 +44,8 @@ export class ChessService {
         this.chess = new Chess()
     }
 
-    move(req) {
-        this.chess.updateBoard({x: +req.query.x1, y: +req.query.y1},{x: +req.query.x2, y: +req.query.y2})
+    move(req): boolean {
+        return this.chess.updateBoard({x: +req.query.x1, y: +req.query.y1},{x: +req.query.x2, y: +req.query.y2})
     }
 
     async renderBoardImage() {

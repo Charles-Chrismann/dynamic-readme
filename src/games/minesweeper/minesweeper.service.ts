@@ -20,12 +20,18 @@ export class MinesweeperService {
         this.generatehistoryGif()
     }
 
-    click(x: number, y: number) {
+    /**
+     * @param x 
+     * @param y 
+     * @returns true if the map has been updated false otherwise
+     */
+    click(x: number, y: number): boolean {
         if(!this.minesweeper) this.minesweeper = new Minesweeper(18, 14, 24);
-        if(this.minesweeper.gameStatus === "Ended") return
-        this.minesweeper.HandleClick({x: x, y: y})
+        if(this.minesweeper.gameStatus === "Ended") return false
+        if(!this.minesweeper.HandleClick({x: x, y: y})) return false
         if(this.minesweeper.map.flat().filter(cell => cell.hidden).length === this.minesweeper.bombsCount) this.minesweeper.gameStatus = "Endend"
         this.history.push(this.renderGameImageCtx())
+        return true
     }
 
     renderGameImageCtx(isFirst: boolean = false) {

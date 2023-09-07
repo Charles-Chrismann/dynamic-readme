@@ -67,12 +67,17 @@ export class Chess {
     ]
   }
 
-  updateBoard(pieceToMoveCoords, destinationCoords) {
-    if(this.status) return
+  /**
+   * @param pieceToMoveCoords 
+   * @param destinationCoords 
+   * @returns true if the board has been updated false otherwise
+   */
+  updateBoard(pieceToMoveCoords, destinationCoords): boolean {
+    if(this.status) return false
     let pieceToMove = utils.getPiece(pieceToMoveCoords, this.board)
-    if(!pieceToMove) return
-    if(pieceToMove.color !== this.playerTurn) return
-    if(!pieceToMove.legalMoves.find(move => move.x === destinationCoords.x && move.y === destinationCoords.y)) return
+    if(!pieceToMove) return false
+    if(pieceToMove.color !== this.playerTurn) return false
+    if(!pieceToMove.legalMoves.find(move => move.x === destinationCoords.x && move.y === destinationCoords.y)) return false
     this.board = utils.computeNextPosition(pieceToMoveCoords, destinationCoords, this.board)
     if(pieceToMove.type === 'Pawn') {
       if(Math.abs(pieceToMoveCoords.y - destinationCoords.y) === 2) this.board[destinationCoords.y][destinationCoords.x].enPassantPossible = true
@@ -98,11 +103,11 @@ export class Chess {
     utils.defineAllLegalMoves(this, this.board);
     
     // game status check
-    console.log(utils.getPlayerMovesCount(this))
     if(utils.getPlayerMovesCount(this) === 0) {
       if(utils.isKingChecked(utils.getKingOfColor(this.playerTurn, this.board), this.board)) this.status = this.playerTurn === 'black' ? 'white' : 'black'
       else this.status = 'pat'
-      console.log(this.status)
     }
+
+    return true
   }
 }

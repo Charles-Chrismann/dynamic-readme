@@ -32,24 +32,25 @@ export class Minesweeper {
       return this.CellExists(click) ? this.map[click.y][click.x] : null
     }
   
-    HandleClick(click) {
+    HandleClick(click): boolean {
       if(this.gameStatus === 'Not Started') {
         this.PlaceBombs(click);
         this.gameStatus = 'Started';
         let cell = this.GetCell(click)
-        if(!cell) return
+        if(!cell) return false
         this.DiscoverRecursively(cell)
       } else if (this.gameStatus === 'Started') {
         let cell = this.GetCell(click)
-        if(!cell) return
+        if(!cell) return false
         if(cell.value === 9) {
           this.reavealAllBombs()
           this.gameLoosed = true;// loose
           this.gameStatus = "Ended";// loose
-          return
+          return true
         }
         this.DiscoverRecursively(cell)
-      } else if(this.gameStatus === 'Ended') return
+      } else if(this.gameStatus === 'Ended') return false
+      return true
     }
   
     PlaceBombs(click) {

@@ -17,8 +17,7 @@ export class MinesweeperController {
 
     @Get('click')
     async click(@Query('x') x: string, @Query('y') y: string, @Res() res: Response){
-        this.minesweeperService.click(+x, +y)
-        await this.readmeService.commit(':boom: Update minesweeper')
+        if(this.minesweeperService.click(+x, +y)) await this.readmeService.commit(':boom: Update minesweeper')
         res.status(200)
         res.redirect(config.datas.repo.url + '#a-classic-minesweeper')
     }
