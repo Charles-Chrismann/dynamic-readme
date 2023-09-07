@@ -1,8 +1,9 @@
 import * as fs from 'fs';
-import { createCanvas } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 const GIFEncoder = require('gifencoder');
 import { Injectable } from '@nestjs/common';
 import { Minesweeper } from './classes/Minesweeper';
+import { Cell } from './classes/Cell';
 
 @Injectable()
 export class MinesweeperService {
@@ -13,10 +14,10 @@ export class MinesweeperService {
       this.new()
     }
 
-    new() {
+    async new() {
         this.minesweeper = new Minesweeper(18, 14, 24)
         this.history = []
-        this.history.push(this.renderGameImageCtx(true))
+        this.history.push(await this.renderGameImageCtx(true))
         this.generatehistoryGif()
     }
 
@@ -25,12 +26,12 @@ export class MinesweeperService {
      * @param y 
      * @returns true if the map has been updated false otherwise
      */
-    click(x: number, y: number): boolean {
+    async click(x: number, y: number): Promise<boolean> {
         if(!this.minesweeper) this.minesweeper = new Minesweeper(18, 14, 24);
         if(this.minesweeper.gameStatus === "Ended") return false
         if(!this.minesweeper.HandleClick({x: x, y: y})) return false
         if(this.minesweeper.map.flat().filter(cell => cell.hidden).length === this.minesweeper.bombsCount) this.minesweeper.gameStatus = "Endend"
-        this.history.push(this.renderGameImageCtx())
+        this.history.push(await this.renderGameImageCtx())
         return true
     }
 
@@ -43,14 +44,19 @@ export class MinesweeperService {
 
       if(isFirst) return ctx
       
-      this.minesweeper.map.forEach(row => {
-        row.forEach(cell => {
+      this.minesweeper.map.forEach(async row => {
+        row.forEach(async (cell: Cell) => {
           ctx.fillStyle = "#ffffff"
           if(cell.hidden) ctx.fillStyle = "#000000"
           else if(cell.value === 0) ctx.fillStyle = "#ffffff"
           else if(cell.value === 9) ctx.fillStyle = "#ff0000"
           else ctx.fillStyle = "#0000ff"
           ctx.fillRect(cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
+          ctx.fillStyle = "#ffffff"
+          if(!cell.hidden && cell.value) {
+            const emojiImage = await loadImage(`./src/assets/emojis/${["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"][cell.value - 1]}.png`)
+            ctx.drawImage(emojiImage, cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
+          }
         })
       })
 
@@ -58,21 +64,24 @@ export class MinesweeperService {
     }
 
     generatehistoryGif() {
-      const tileSize = 16;
-      const gifEncoder = new GIFEncoder(this.minesweeper.width * tileSize, this.minesweeper.height * tileSize)
-      gifEncoder.createWriteStream().pipe(fs.createWriteStream('./public/minesweeper.gif'))
-      gifEncoder.start()
-      gifEncoder.setRepeat(0)
-      gifEncoder.setDelay(500)
-      gifEncoder.setQuality(10)
-      this.history.forEach(buffer => {
-        gifEncoder.addFrame(buffer)
+      return new Promise((resolve, reject) => {
+        const tileSize = 16;
+        const gifEncoder = new GIFEncoder(this.minesweeper.width * tileSize, this.minesweeper.height * tileSize)
+        gifEncoder.createWriteStream().pipe(fs.createWriteStream('./public/minesweeper.gif'))
+        gifEncoder.start()
+        gifEncoder.setRepeat(0)
+        gifEncoder.setDelay(Math.floor(5000 / this.history.length ?? 1))
+        gifEncoder.setQuality(10)
+        this.history.forEach(buffer => {
+          gifEncoder.addFrame(buffer)
+        })
+        gifEncoder.finish()
+        resolve(true)
       })
-      gifEncoder.finish()
     }
 
     toMd() {
-      this.generatehistoryGif()
+      this.generatehistoryGif() // asyncrone  mais peux poser un probleme de timing
         let str = `<h3 align="center">A classic Minesweeper</h3>\n`
         str += `<p align="center">\n`
         str += this.minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
