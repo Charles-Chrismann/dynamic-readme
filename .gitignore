@@ -2,7 +2,11 @@ node_modules/
 .vscode
 
 dist/
+
 .env
+.env*
+!.env.example
+
 config.json
 serviceAccountKey.json
 public/board.png

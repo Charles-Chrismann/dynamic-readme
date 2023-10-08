@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  dynamic-readme:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env.dev
+    command: npm run start:dev
+    ports:
+      - 3000:${EC2_PORT}
+    networks:
+      - app-network
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
+volumes:
+  redis-data:
+networks:
+  app-network:

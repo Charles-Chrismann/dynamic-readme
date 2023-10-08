@@ -17,8 +17,7 @@ export class MinesweeperService {
     async new() {
         this.minesweeper = new Minesweeper(18, 14, 24)
         this.history = []
-        this.history.push(await this.renderGameImageCtx(true))
-        this.generatehistoryGif()
+        this.history.push(this.renderGameImageCtx(true))
     }
 
     /**
@@ -35,7 +34,7 @@ export class MinesweeperService {
         return true
     }
 
-    renderGameImageCtx(isFirst: boolean = false) {
+    async renderGameImageCtx(isFirst: boolean = false) {
       const tileSize = 16;
       const canvas = createCanvas(tileSize * this.minesweeper.width, tileSize * this.minesweeper.height)
       const ctx = canvas.getContext('2d')
@@ -43,28 +42,25 @@ export class MinesweeperService {
       ctx.fillRect(0, 0, tileSize * this.minesweeper.width, tileSize * this.minesweeper.height)
 
       if(isFirst) return ctx
-      
-      this.minesweeper.map.forEach(async row => {
-        row.forEach(async (cell: Cell) => {
-          ctx.fillStyle = "#ffffff"
-          if(cell.hidden) ctx.fillStyle = "#000000"
-          else if(cell.value === 0) ctx.fillStyle = "#ffffff"
-          else if(cell.value === 9) ctx.fillStyle = "#ff0000"
-          else ctx.fillStyle = "#0000ff"
-          ctx.fillRect(cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
-          ctx.fillStyle = "#ffffff"
-          if(!cell.hidden && cell.value) {
-            const emojiImage = await loadImage(`./src/assets/emojis/${["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"][cell.value - 1]}.png`)
-            ctx.drawImage(emojiImage, cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
+
+      for(let i = 0; i < this.minesweeper.width; i++) {
+        for(let j = 0; j < this.minesweeper.height; j++) {
+          const cell = this.minesweeper.map[j][i]
+          if(cell.hidden) continue
+          if(!cell.value) {
+            ctx.fillStyle = "#ffffff"
+            ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize)
+            continue
           }
-        })
-      })
+          const emojiImage = await loadImage(`./src/assets/emojis/${["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"][cell.value - 1]}.png`)
+          ctx.drawImage(emojiImage, cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
+        }
+      }
 
       return ctx
     }
 
     generatehistoryGif() {
-      return new Promise((resolve, reject) => {
         const tileSize = 16;
         const gifEncoder = new GIFEncoder(this.minesweeper.width * tileSize, this.minesweeper.height * tileSize)
         gifEncoder.createWriteStream().pipe(fs.createWriteStream('./public/minesweeper.gif'))
@@ -76,8 +72,6 @@ export class MinesweeperService {
           gifEncoder.addFrame(buffer)
         })
         gifEncoder.finish()
-        resolve(true)
-      })
     }
 
     toMd() {

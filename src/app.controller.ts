@@ -9,8 +9,8 @@ export class AppController {
     private readonly readmeService: ReadmeService,
     ) {}
 
-  @Get()
-  async getHello(): Promise<string> {
-    return this.appService.getHello();
-  }
+  // @Get()
+  // async getHello(): Promise<string> {
+  //   return this.appService.getHello();
+  // }
 }

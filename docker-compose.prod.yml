@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  dynamic-readme:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm run dev
+    ports:
+      - 3000:3333
+    networks:
+      - app-network
+    volumes:
+      - .:/usr/src/app
+
+networks:
+  - app-network
