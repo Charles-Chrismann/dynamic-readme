@@ -32,7 +32,7 @@ export class ReadmeService {
     return returnString
   }
 
-  private render(): string {
+  private async render(): Promise<string> {
     let readMeString = '';
     let skills = config.skills;
 
@@ -90,7 +90,7 @@ export class ReadmeService {
     }).join('');
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
-    readMeString += this.minesweeperService.toMd();
+    readMeString += await this.minesweeperService.toMd();
     readMeString += this.chessService.toMd();
     readMeString += this.wordleService.toMd();
 
@@ -118,8 +118,9 @@ export class ReadmeService {
       )).data.sha;
     }
 
-    const buffer = Buffer.from(this.render());
+    const buffer = Buffer.from(await this.render());
     const base64 = buffer.toString('base64');
+    return
     let pushResp = await octokit.request(
       `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
       {

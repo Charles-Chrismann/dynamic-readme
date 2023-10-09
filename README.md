@@ -7,7 +7,7 @@ Requirements:
 Running in developpement:
 
 ```sh
-docker-compose -f docker-compose.dev.yml up
+docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build
 ```
 
 Running in production:

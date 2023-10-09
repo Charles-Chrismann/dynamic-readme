@@ -13,6 +13,12 @@ export class Minesweeper {
       this.bombsCount = bombsCount;
       this.CreateEmptyMap();
     }
+
+    from(json){
+      Object.assign(this, json)
+      this.map = json.map.map(row => row.map(cell => new Cell(cell.x, cell.y, cell.value, cell.hidden)))
+      return this
+    }
   
     CreateEmptyMap() {
       for(let i = 0; i < this.height; i++) {

@@ -1,6 +1,8 @@
 version: '3.7'
 services:
   dynamic-readme:
+    container_name: dr-dev-app
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,6 +18,8 @@ services:
     depends_on:
       - redis
   redis:
+    container_name: dr-dev-redis
+    restart: unless-stopped
     image: redis:alpine
     ports:
       - 6379:6379

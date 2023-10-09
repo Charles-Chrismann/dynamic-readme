@@ -7,9 +7,10 @@ import { ReadmeModule } from 'src/readme/readme.module';
 import { WordleService } from './wordle/wordle.service';
 import { WordleController } from './wordle/wordle.controller';
 import { SudokuModule } from './sudoku/sudoku.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
-  imports: [forwardRef(() => ReadmeModule), SudokuModule],
+  imports: [forwardRef(() => ReadmeModule), SudokuModule, RedisModule],
   controllers: [MinesweeperController, ChessController, WordleController],
   providers: [MinesweeperService, ChessService, WordleService],
   exports: [MinesweeperService, ChessService, WordleService]

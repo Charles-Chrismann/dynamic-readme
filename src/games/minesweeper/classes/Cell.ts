@@ -2,8 +2,7 @@ export class Cell {
     x: number;
     y: number;
     value: number;
-    hidden = true;
-    constructor(x: number, y: number, value: number){
+    constructor(x: number, y: number, value: number, public hidden: boolean = true){
       this.x = x;
       this.y = y;
       this.value = value;

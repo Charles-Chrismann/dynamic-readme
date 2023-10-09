@@ -11,6 +11,7 @@ import { RequestModule } from './request/request.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { ConfigModule } from '@nestjs/config';
       rootPath: join(__dirname, '..', '..', 'public'),
     }),
     RequestModule,
-    FirebaseModule
+    FirebaseModule,
+    RedisModule
   ],
   controllers: [AppController],
   providers: [AppService, ReadmeService],
