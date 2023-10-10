@@ -48,7 +48,6 @@ export class Minesweeper {
         if(!cell) return false
         this.DiscoverRecursively(cell)
       } else if (this.gameStatus === 'Started') {
-        console.log('startetd ?')
         let cell = this.GetCell(click)
         if(!cell) return false
         if(cell.value === 9) {

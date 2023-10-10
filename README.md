@@ -16,4 +16,10 @@ Running in production:
 docker-compose -f docker-compose.prod.yml up
 ```
 
+delet all volumes
+
+```sh
+docker compose -f docker-compose.dev.yml --env-file .env.dev down -v
+```
+
 note: production file not ready
