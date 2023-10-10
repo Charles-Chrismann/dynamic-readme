@@ -11,7 +11,7 @@ export class MinesweeperService implements OnModuleInit {
   constructor(private redisService: RedisService) {}
 
   async onModuleInit() {
-    if(!await this.redisService.client.get('minesweeper')) this.new()
+    if(!await this.redisService.client.get('minesweeper')) await this.new()
   }
 
   async new() {

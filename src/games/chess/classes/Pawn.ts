@@ -4,8 +4,10 @@ import { Piece } from './Piece';
 export class Pawn extends Piece {
     type = 'Pawn';
     uniqueInitial = 'p';
-    enPassantPossible = false
-    moved = false;
+
+    constructor(x: number, y: number, color: 'black' | 'white', public moved = false, public enPassantPossible = false) {
+      super(x, y, color)
+    }
 
     computeLegalMoves(chessInstance, board) {
         this.legalMoves = [];
