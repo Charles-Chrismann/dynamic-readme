@@ -7,16 +7,18 @@ export class Minesweeper {
     map = [];
     gameStatus = 'Not Started'
     gameLoosed = false;
-    constructor(width: number, height: number, bombsCount: number) {
-      this.height = height;
-      this.width = width;
-      this.bombsCount = bombsCount;
-      this.CreateEmptyMap();
-    }
+    constructor(...setup: [Record<string, any>] | [number, number, number]) {
+      if(setup.length === 1) {
+        const json = setup.shift()
+          Object.assign(this, json)
+          this.map = json.map.map(row => row.map(cell => new Cell(cell.x, cell.y, cell.value, cell.hidden)))
+        return this
+      }
 
-    from(json){
-      Object.assign(this, json)
-      this.map = json.map.map(row => row.map(cell => new Cell(cell.x, cell.y, cell.value, cell.hidden)))
+      this.width = setup.shift();
+      this.height = setup.shift();
+      this.bombsCount = setup.shift();
+      this.CreateEmptyMap();
       return this
     }
   
@@ -46,6 +48,7 @@ export class Minesweeper {
         if(!cell) return false
         this.DiscoverRecursively(cell)
       } else if (this.gameStatus === 'Started') {
+        console.log('startetd ?')
         let cell = this.GetCell(click)
         if(!cell) return false
         if(cell.value === 9) {
@@ -53,6 +56,8 @@ export class Minesweeper {
           this.gameLoosed = true;// loose
           this.gameStatus = "Ended";// loose
           return true
+        } else if(!cell.hidden) {
+          return false
         }
         this.DiscoverRecursively(cell)
       } else if(this.gameStatus === 'Ended') return false

@@ -8,8 +8,6 @@ import { commandOptions } from 'redis';
 
 @Injectable()
 export class MinesweeperService implements OnModuleInit {
-  history: any[] = []
-
   constructor(private redisService: RedisService) {}
 
   async onModuleInit() {
@@ -17,7 +15,6 @@ export class MinesweeperService implements OnModuleInit {
   }
 
   async new() {
-    console.log('creating new')
     const minesweeper = new Minesweeper(18, 14, 24)
     await Promise.all([
       this.redisService.client.set('minesweeper', JSON.stringify(minesweeper)),
@@ -34,7 +31,7 @@ export class MinesweeperService implements OnModuleInit {
    */
   async click(x: number, y: number): Promise<boolean> {
     const minesweeperData: Record<string, any> = JSON.parse(await this.redisService.client.get('minesweeper'))
-    const minesweeper = minesweeperData ? (new Minesweeper(18, 14, 24)).from(minesweeperData) : await this.new()
+    const minesweeper = minesweeperData ? new Minesweeper(minesweeperData) : await this.new()
     if(minesweeper.gameStatus === "Ended") return false
     if(!minesweeper.HandleClick({x: x, y: y})) return false
     if(minesweeper.map.flat().filter(cell => cell.hidden).length === minesweeper.bombsCount) minesweeper.gameStatus = "Endend"
@@ -55,6 +52,8 @@ export class MinesweeperService implements OnModuleInit {
       return
     }
 
+    const emojis = {}
+    const emojiList = ["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"]
     for(let i = 0; i < minesweeperData.width; i++) {
       for(let j = 0; j < minesweeperData.height; j++) {
         const cell = minesweeperData.map[j][i]
@@ -64,12 +63,15 @@ export class MinesweeperService implements OnModuleInit {
           ctx.fillRect(i * tileSize, j * tileSize, tileSize, tileSize)
           continue
         }
-        const emojiImage = await loadImage(`./src/assets/emojis/${["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"][cell.value - 1]}.png`)
+        const emojiImage = await (emojis[emojiList[cell.value - 1]] ?? (async () => {
+          const emoji = emojiList[cell.value - 1]
+          emojis[emoji] = await loadImage(`./src/assets/emojis/${emoji}.png`)
+          return emojis[emoji]
+        })())
         ctx.drawImage(emojiImage, cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
       }
     }
     const savedImages = await this.redisService.client.hGetAll('minesweeperImages')
-    console.log('renderGameImageCtx', Object.keys(savedImages))
     this.redisService.client.hSet('minesweeperImages', Object.keys(savedImages).length, ctx.canvas.toBuffer('image/png'))
   }
 
@@ -99,7 +101,7 @@ export class MinesweeperService implements OnModuleInit {
   async toMd() {
     this.generatehistoryGif() // asyncrone  mais peux poser un probleme de timing
     
-    const minesweeper: Minesweeper = (new Minesweeper(18, 14, 24)).from(JSON.parse(await this.redisService.client.get('minesweeper')))
+    const minesweeper: Minesweeper = new Minesweeper(JSON.parse(await this.redisService.client.get('minesweeper')))
     let str = `<h3 align="center">A classic Minesweeper</h3>\n`
     str += `<p align="center">\n`
     str += minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
@@ -108,7 +110,8 @@ export class MinesweeperService implements OnModuleInit {
     else if(minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>\n`
     else str += minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>\n` : `<p align="center">Congrats you won !</p>\n`
     
-    if(this.history.length > 1) str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" />\n</p>`
+    const historyLength = Object.values(await this.redisService.client.hGetAll(commandOptions({ returnBuffers: true }),'minesweeperImages')).length
+    if(historyLength) str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" />\n</p>\n`
 
     str += `<h3 align="center">\n  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
 

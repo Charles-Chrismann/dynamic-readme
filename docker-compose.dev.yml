@@ -8,6 +8,8 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env.dev
+    environment:
+      - NO_COMMIT=true
     command: npm run start:dev
     ports:
       - 3000:${EC2_PORT}

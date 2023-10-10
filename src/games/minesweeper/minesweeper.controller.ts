@@ -9,7 +9,7 @@ export class MinesweeperController {
     constructor(private minesweeperService: MinesweeperService, private readmeService: ReadmeService) {}
     @Get('new')
     async new(@Res() res: Response) {
-        this.minesweeperService.new()
+        await this.minesweeperService.new()
         await this.readmeService.commit(':boom: Reset minesweeper')
         res.status(200)
         res.redirect(config.datas.repo.url + '#a-classic-minesweeper')
