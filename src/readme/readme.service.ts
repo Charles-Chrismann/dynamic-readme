@@ -91,8 +91,8 @@ export class ReadmeService {
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
     readMeString += await this.minesweeperService.toMd();
-    readMeString += this.chessService.toMd();
-    readMeString += this.wordleService.toMd();
+    readMeString += await this.chessService.toMd();
+    readMeString += await this.wordleService.toMd();
 
     readMeString += `<h1 align="center">Work in progress</h1>\n`;
     readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>\n`;
