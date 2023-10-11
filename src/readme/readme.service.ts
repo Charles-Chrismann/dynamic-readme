@@ -120,7 +120,7 @@ export class ReadmeService {
 
     const buffer = Buffer.from(await this.render());
     const base64 = buffer.toString('base64');
-    if(process.env.NO_COMMIT) return
+    if(process.env.NO_COMMIT === "true") return
     let pushResp = await octokit.request(
       `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
       {

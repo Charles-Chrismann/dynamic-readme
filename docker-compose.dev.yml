@@ -9,7 +9,7 @@ services:
     env_file:
       - .env.dev
     environment:
-      - NO_COMMIT=true
+      - NO_COMMIT=false
     command: npm run start:dev
     ports:
       - 3000:${EC2_PORT}
