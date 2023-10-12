@@ -35,8 +35,8 @@ export class GameboyService implements OnModuleInit {
 
     ctx.putImageData(ctx_data, 0, 0);
 
-    const stream = canvas.createJPEGStream()
-    res.setHeader('Content-Type', 'image/jpeg')
+    const stream = canvas.createPNGStream()
+    res.setHeader('Content-Type', 'image/png')
     stream.pipe(res)
   }
 
@@ -82,28 +82,28 @@ export class GameboyService implements OnModuleInit {
     str += `  <a href="#">\n    <img src="./assets/gameboy/top.png" width="308">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/left.jpg" height="144" width="69.5">\n  </a>\n`
-    str += `  <a href="#">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/frame" width="160" height="144">\n  </a>\n`
+    str += `  <a href="#">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/frame?a=${(Math.random() + 1).toString(36).substring(7)}" width="160" height="144">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/right.jpg" height="144" width="69.5">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/bot-screen.jpg" width="308">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="47" height="36">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=up">\n    <img src="./assets/gameboy/croix-top.jpg" height="36">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=up">\n    <img src="./assets/gameboy/croix-top.jpg" height="36">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="226.5" height="36">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=left">\n    <img src="./assets/gameboy/croix-left.jpg" height="26">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=left">\n    <img src="./assets/gameboy/croix-left.jpg" height="26">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/croix-mid.jpg" height="26">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=right">\n    <img src="./assets/gameboy/croix-right.jpg" height="26">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=b">\n    <img src="./assets/gameboy/b.jpg" height="26">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=a">\n    <img src="./assets/gameboy/a.jpg" height="26">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=right">\n    <img src="./assets/gameboy/croix-right.jpg" height="26">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=b">\n    <img src="./assets/gameboy/b.jpg" height="26">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=a">\n    <img src="./assets/gameboy/a.jpg" height="26">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="47" height="36">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=down">\n    <img src="./assets/gameboy/croix-bot.jpg" height="36">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=down">\n    <img src="./assets/gameboy/croix-bot.jpg" height="36">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="226.5" height="36">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="82" height="51">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=select">\n    <img src="./assets/gameboy/select.jpg" height="51">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=start">\n    <img src="./assets/gameboy/start.jpg" height="51">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=select">\n    <img src="./assets/gameboy/select.jpg" height="51">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input-commit?input=start">\n    <img src="./assets/gameboy/start.jpg" height="51">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/rect.jpg" width="110" height="51">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/bot-bot.png" width="308">\n  </a>\n`
