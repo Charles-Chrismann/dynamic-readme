@@ -34,7 +34,8 @@
     "octokit": "^2.0.14",
     "redis": "^4.6.10",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "serverboy": "gitlab:piglet-plays/serverboy.js"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

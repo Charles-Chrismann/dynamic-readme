@@ -6,13 +6,14 @@ import { ChessController } from './chess/chess.controller';
 import { ReadmeModule } from 'src/readme/readme.module';
 import { WordleService } from './wordle/wordle.service';
 import { WordleController } from './wordle/wordle.controller';
-import { SudokuModule } from './sudoku/sudoku.module';
 import { RedisModule } from 'src/redis/redis.module';
+import { GameboyController } from './gameboy/gameboy.controller';
+import { GameboyService } from './gameboy/gameboy.service';
 
 @Module({
-  imports: [forwardRef(() => ReadmeModule), SudokuModule, RedisModule],
-  controllers: [MinesweeperController, ChessController, WordleController],
-  providers: [MinesweeperService, ChessService, WordleService],
-  exports: [MinesweeperService, ChessService, WordleService]
+  imports: [forwardRef(() => ReadmeModule), RedisModule],
+  controllers: [MinesweeperController, ChessController, WordleController, GameboyController],
+  providers: [MinesweeperService, ChessService, WordleService, GameboyService],
+  exports: [MinesweeperService, ChessService, WordleService, GameboyService]
 })
 export class GamesModule {}

@@ -5,6 +5,7 @@ import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
 import { ChessService } from 'src/games/chess/chess.service';
 import { RequestService } from 'src/request/request.service';
 import { WordleService } from 'src/games/wordle/wordle.service';
+import { GameboyService } from 'src/games/gameboy/gameboy.service';
 
 @Injectable()
 export class ReadmeService {
@@ -16,6 +17,7 @@ export class ReadmeService {
     private minesweeperService: MinesweeperService,
     private chessService: ChessService,
     private wordleService: WordleService,
+    private gameboyService: GameboyService
   ) {
     this.currentContentSha = null;
   }
@@ -90,6 +92,7 @@ export class ReadmeService {
     }).join('');
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
+    readMeString += this.gameboyService.toMd();
     readMeString += await this.minesweeperService.toMd();
     readMeString += await this.chessService.toMd();
     readMeString += await this.wordleService.toMd();
