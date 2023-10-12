@@ -103,6 +103,7 @@ export class ChessService implements OnModuleInit {
 
   async toMd() {
     const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
+    utils.defineAllLegalMoves(chess, chess.board);
 
     let str = `<h3 align="center">A classic Chess</h3>\n`
     this.renderBoardImage()
