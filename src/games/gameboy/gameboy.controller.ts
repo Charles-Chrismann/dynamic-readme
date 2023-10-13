@@ -17,12 +17,12 @@ export class GameboyController {
   }
 
   @Get('/save')
-  save() {
-    return this.gameboyService.save()
+  save(@Res() res: Response) {
+    return this.gameboyService.save(res)
   }
 
   @Post('/load')
-  load(@Body('save') save) {
+  load(@Body() save) {
     console.log('load')
     this.gameboyService.load(save)
   }

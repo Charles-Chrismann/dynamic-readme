@@ -28,6 +28,7 @@
     "@nestjs/serve-static": "^4.0.0",
     "axios": "^1.4.0",
     "canvas": "^2.11.2",
+    "compress-json": "^2.1.2",
     "firebase-admin": "^11.10.1",
     "gifencoder": "^2.0.1",
     "lodash-es": "^4.17.21",
