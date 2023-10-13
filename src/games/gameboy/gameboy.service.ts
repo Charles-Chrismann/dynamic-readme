@@ -37,6 +37,7 @@ export class GameboyService implements OnModuleInit {
 
     const stream = canvas.createPNGStream()
     res.setHeader('Content-Type', 'image/png')
+    res.setHeader('Cache-Control', 'public, max-age=0')
     stream.pipe(res)
   }
 
@@ -82,7 +83,7 @@ export class GameboyService implements OnModuleInit {
     str += `  <a href="#">\n    <img src="./assets/gameboy/top.png" width="308">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/left.jpg" height="144" width="69.5">\n  </a>\n`
-    str += `  <a href="#">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/frame?a=${(Math.random() + 1).toString(36).substring(7)}" width="160" height="144">\n  </a>\n`
+    str += `  <a href="#">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/doframe" width="160" height="144">\n  </a>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/right.jpg" height="144" width="69.5">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="#">\n    <img src="./assets/gameboy/bot-screen.jpg" width="308">\n  </a>\n`
