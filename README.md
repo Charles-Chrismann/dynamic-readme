@@ -7,6 +7,10 @@ Requirements:
 Running in developpement:
 
 ```sh
+git pull
+npm i
+rm -rf dist/
+docker build -t charleschrismann/dynamic-readme:latest .
 docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build
 ```
 

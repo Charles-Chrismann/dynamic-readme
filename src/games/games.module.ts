@@ -9,11 +9,12 @@ import { WordleController } from './wordle/wordle.controller';
 import { RedisModule } from 'src/redis/redis.module';
 import { GameboyController } from './gameboy/gameboy.controller';
 import { GameboyService } from './gameboy/gameboy.service';
+import { GameboyGateway } from './gameboy/gameboy.gateway';
 
 @Module({
   imports: [forwardRef(() => ReadmeModule), RedisModule],
   controllers: [MinesweeperController, ChessController, WordleController, GameboyController],
-  providers: [MinesweeperService, ChessService, WordleService, GameboyService],
+  providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway],
   exports: [MinesweeperService, ChessService, WordleService, GameboyService]
 })
 export class GamesModule {}
