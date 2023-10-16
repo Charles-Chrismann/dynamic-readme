@@ -2,8 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Readable } from 'stream';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { createCanvas } from 'canvas';
+import { createCanvas, ImageData } from 'canvas';
 import { compress, decompress } from 'compress-json';
+import { Response } from 'express';
+const GIFEncoder = require('gifencoder');
 const Gameboy = require('serverboy')
 
 const rom = fs.readFileSync(path.join(process.env.PWD, 'roms', process.env.ROM_NAME))
@@ -13,9 +15,9 @@ export class GameboyService implements OnModuleInit {
   private readonly logger = new Logger(GameboyService.name)
 
   gameboy_instance: any
-  currentScreen: any
   renderInterval: NodeJS.Timer | null
   renderTimeout: NodeJS.Timeout | null
+  lastInputFrames: number[][] = []
 
   constructor() {}
 
@@ -59,10 +61,15 @@ export class GameboyService implements OnModuleInit {
   }
 
   skipFrames(n) {
-    for(let i = 0; i < n; i++) this.gameboy_instance.doFrame()
+    const frames = []
+    for(let i = 0; i < n; i++) {
+      if(i % 4 === 0) frames.push(this.gameboy_instance.doFrame())
+      else this.gameboy_instance.doFrame()
+    }
+    return frames
   }
 
-  frame(res) {
+  frame(res: Response) {
     const canvas = createCanvas(160, 144)
     const ctx = canvas.getContext('2d')
     let ctx_data = ctx.createImageData(160, 144);
@@ -81,16 +88,35 @@ export class GameboyService implements OnModuleInit {
     stream.pipe(res)
   }
 
+  gif(res: Response) {
+    res.setHeader('Content-Type', 'image/gif')
+    res.setHeader('Cache-Control', 'public, max-age=0')
+
+    const gifEncoder = new GIFEncoder(160, 144)
+    gifEncoder.createWriteStream().pipe(res)
+    gifEncoder.start()
+    gifEncoder.setRepeat(-1);
+    gifEncoder.setDelay(64);
+    gifEncoder.setQuality(10);
+    const canvas = createCanvas(160, 144)
+    const ctx = canvas.getContext('2d')
+    for(let i = 0; i < this.lastInputFrames.length; i++) {
+      ctx.putImageData(new ImageData(Uint8ClampedArray.from(this.lastInputFrames[i]),160,144), 0, 0);
+      gifEncoder.addFrame(ctx)
+    }
+    gifEncoder.finish();
+  }
+
   input(input: string) {
     this.stopRenderSession()
+    this.lastInputFrames = []
 
     for(let i = 0; i < 5; i++) {
       this.gameboy_instance.pressKey(input)
-      this.gameboy_instance.doFrame()
+      this.lastInputFrames.push(this.gameboy_instance.doFrame())
     }
 
-    this.skipFrames(300)
-    this.currentScreen = this.gameboy_instance.doFrame()
+    this.lastInputFrames = this.lastInputFrames.concat(this.skipFrames(300))
 
     this.setRenderSession()
   }
@@ -125,7 +151,7 @@ export class GameboyService implements OnModuleInit {
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/top.png" width="308">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/left.jpg" height="144" width="69.5">\n  </a>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/doframe" width="160" height="144">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/dogif" width="160" height="144">\n  </a>\n`
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/right.jpg" height="144" width="69.5">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/bot-screen.jpg" width="308">\n  </a>\n`

@@ -31,4 +31,10 @@ export class GameboyController {
   frame(@Res() res: Response) {
     return this.gameboyService.frame(res)
   }
+
+  @Get('/dogif')
+  gif(@Res() res: Response) {
+    if(!this.gameboyService.lastInputFrames.length) return this.gameboyService.frame(res)
+    return this.gameboyService.gif(res)
+  }
 }
