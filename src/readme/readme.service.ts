@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Octokit } from 'octokit';
 import * as config from '../../config.json';
 import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
@@ -110,6 +110,24 @@ export class ReadmeService {
     return readMeString;
   }
 
+  async push(octokit: Octokit, message: string, content: string, sha: string): Promise<string> {
+    return (await octokit.request(
+      `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
+      {
+        owner: config.datas.repo.owner,
+        repo: config.datas.repo.name,
+        path: config.datas.repo.readme.path,
+        message,
+        committer: {
+          name: process.env.OCTO_COMMITTER_NAME,
+          email: process.env.OCTO_COMMITTER_EMAIL,
+        },
+        content,
+        sha,
+      },
+    )).data.content.sha
+  }
+
   async commit(commitMessage: string) {
     this.startDateRender = Date.now();
     const octokit = new Octokit({ auth: process.env.GH_TOKEN });
@@ -124,21 +142,13 @@ export class ReadmeService {
     const buffer = Buffer.from(await this.render());
     const base64 = buffer.toString('base64');
     if(process.env.NO_COMMIT === "true") return
-    let pushResp = await octokit.request(
-      `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
-      {
-        owner: config.datas.repo.owner,
-        repo: config.datas.repo.name,
-        path: config.datas.repo.readme.path,
-        message: commitMessage,
-        committer: {
-          name: process.env.OCTO_COMMITTER_NAME,
-          email: process.env.OCTO_COMMITTER_EMAIL,
-        },
-        content: base64,
-        sha: sha,
-      },
-    );
-    this.currentContentSha = pushResp.data.content.sha;
+    let pushRespSha: string
+    try {
+      pushRespSha = await this.push(octokit, commitMessage, base64, sha)
+    } catch (e) {
+      this.currentContentSha = (await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)).data.sha
+      pushRespSha = await this.push(octokit, commitMessage, base64, this.currentContentSha)
+    }
+    this.currentContentSha = pushRespSha;
   }
 }
