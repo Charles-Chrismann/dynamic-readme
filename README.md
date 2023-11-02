@@ -26,4 +26,15 @@ delet all volumes
 docker compose -f docker-compose.dev.yml --env-file .env.dev down -v
 ```
 
+redis cli
+
+```
+redis-cli -h localhost -p 6379
+KEYS *
+```
+
 note: production file not ready
+
+To add
+screenshot of the game
+playing time

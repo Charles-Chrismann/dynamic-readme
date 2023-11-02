@@ -10,9 +10,10 @@ import { RedisModule } from 'src/redis/redis.module';
 import { GameboyController } from './gameboy/gameboy.controller';
 import { GameboyService } from './gameboy/gameboy.service';
 import { GameboyGateway } from './gameboy/gameboy.gateway';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [forwardRef(() => ReadmeModule), RedisModule],
+  imports: [forwardRef(() => ReadmeModule), RedisModule, AuthModule],
   controllers: [MinesweeperController, ChessController, WordleController, GameboyController],
   providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway],
   exports: [MinesweeperService, ChessService, WordleService, GameboyService]

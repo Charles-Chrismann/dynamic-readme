@@ -92,7 +92,7 @@ export class ReadmeService {
     }).join('');
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
-    readMeString += this.gameboyService.toMd();
+    readMeString += await this.gameboyService.toMd();
     readMeString += await this.minesweeperService.toMd();
     readMeString += await this.chessService.toMd();
     readMeString += await this.wordleService.toMd();

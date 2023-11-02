@@ -2,12 +2,11 @@ import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { Response } from 'express';
 import * as config from '../../../config.json';
 import { GameboyService } from './gameboy.service';
-import { ReadmeService } from 'src/readme/readme.service';
 
 @Controller('gameboy')
 export class GameboyController {
 
-  constructor(private gameboyService: GameboyService, private readmeService: ReadmeService){}
+  constructor(private gameboyService: GameboyService){}
 
   @Get('/input')
   input(@Query('input') input: string, @Res() res: Response) {
@@ -23,7 +22,6 @@ export class GameboyController {
 
   @Post('/load')
   load(@Body() save) {
-    console.log('load')
     this.gameboyService.load(save)
   }
 

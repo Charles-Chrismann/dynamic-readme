@@ -5,6 +5,8 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { createCanvas, ImageData } from 'canvas';
 import { compress, decompress } from 'compress-json';
 import { Response } from 'express';
+import { Cron } from '@nestjs/schedule';
+import { RedisService } from 'src/redis/redis.service';
 const GIFEncoder = require('gifencoder');
 const Gameboy = require('serverboy')
 
@@ -19,14 +21,25 @@ export class GameboyService implements OnModuleInit {
   renderTimeout: NodeJS.Timeout | null
   lastInputFrames: number[][] = []
 
-  constructor() {}
+  constructor(private readonly redis: RedisService) {}
 
   async onModuleInit() {
-    if(!this.gameboy_instance) {
+    const gi = JSON.parse(await this.redis.client.get('gameboy:instance'))
+    if(gi) {
+      this.load(gi)
+    }
+    else {
       this.gameboy_instance = new Gameboy()
       this.gameboy_instance.loadRom(rom)
       this.setRenderSession()
     }
+  }
+
+  @Cron('0 0 * * * *')
+  async backup() {
+    this.logger.log('[SHEDULED] Saving gameboy')
+    const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
+    this.redis.client.set('gameboy:instance', JSON.stringify(compress(save)))
   }
 
   setRenderInterval(frameInterval = 5) {
@@ -36,7 +49,6 @@ export class GameboyService implements OnModuleInit {
   }
 
   stopRenderInterval(intervalId) {
-    console.log('Interupt render')
     clearInterval(intervalId)
   }
 
@@ -49,13 +61,11 @@ export class GameboyService implements OnModuleInit {
   }
 
   setRenderSession() {
-    console.log('start sess')
     this.setRenderInterval()
     this.setRenderTimeout(this.renderInterval)
   }
 
   stopRenderSession() {
-    console.log('stop sess')
     this.stopRenderInterval(this.renderInterval)
     this.stopRenderTimeout()
   }
@@ -143,8 +153,21 @@ export class GameboyService implements OnModuleInit {
     this.setRenderSession()
   }
 
+  async renderInputBoard() {
+    let str = `<table align="center">\n  <thead>\n`
+    str += '    <tr>\n      <th colspan="4">Game Contributions</th>\n    </tr>\n'
+    str += `    <tr>\n      <th>Rank</th>\n      <th colspan="2">Player</th>\n      <th>Inputs</th>\n    </tr>\n  </thead>\n  <tbody>\n`
+    const playersIds = await this.redis.client.keys("gameboy:players:*")
+    const players = await Promise.all(playersIds.map(player => this.redis.client.hGetAll(player)))
+    const users = await Promise.all(players.map(player => this.redis.client.hGetAll(`user:${player.id}`)))
+    const rowsDatas = players.map((player, index) => ({...player, ...users[index]})).sort((a, b) => +b.inputCount - +a.inputCount)
+    str += rowsDatas.map((row, i) => `    <tr>\n      <th>${i + 1}</th>\n      <th><a href="https://github.com/${row.login}"><img src="${row.avatar_url}" alt="profil picture" width="40"></img></th>\n      <th><a href="https://github.com/${row.login}">@${row.login}</a></th>\n      <th>${row.inputCount}</th>    </tr>\n`).join('')
+    str += `  </tbody>\n</table>\n\n`
 
-  toMd() {
+    return str
+  }
+
+  async toMd() {
     let str = `<h3 align="center">GitHub Plays Pokemon ?</h3>\n`
     str += `<p align="center">`
 
@@ -175,7 +198,9 @@ export class GameboyService implements OnModuleInit {
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input?input=start">\n    <img src="./assets/gameboy/start.jpg" height="51">\n  </a>\n`
     str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/rect.jpg" width="110" height="51">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/bot-bot.png" width="308">\n  </a>\n`
+    str += `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gameboy/input">\n    <img src="./assets/gameboy/bot-bot.png" width="308">\n  </a>\n\n`
+
+    str += await this.renderInputBoard()
 
     str += `</p>\n\n<hr>\n\n`
 

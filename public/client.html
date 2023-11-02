@@ -4,17 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-    #mainCanvas {
-      width: 480px;
-      height: 432px;
-      image-rendering: pixelated;
-      background-color: #000;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <canvas id="mainCanvas" width="160" height="144"></canvas>
+  <div class="controls">
+    <div class="cross">
+      <button class="up"></button>
+      <button class="right"></button>
+      <button class="down"></button>
+      <button class="left"></button>
+    </div>
+    <div class="ab">
+      <button class="b">B</button>
+      <button class="a">A</button>
+    </div>
+    <div class="ss">
+      <button class="select">SELECT</button>
+      <button class="start">START</button>
+    </div>
+  </div>
   <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
   <script src="./js/main.js"></script>
 </body>
