@@ -8,17 +8,23 @@
 body {
   display: flex;
   flex-flow: column;
+  flex-direction: column;
+  align-items: center;
   height: 100vh;
+  background-color: #9c98af;
 }
 body #mainCanvas {
   image-rendering: pixelated;
   background-color: #000;
+  aspect-ratio: 160/144;
+  width: 100%;
 }
 body .controls {
   flex: 1 1 auto;
   background-color: #d9d9d9;
   position: relative;
   padding: 2rem;
+  width: 100%;
 }
 body .controls .cross {
   position: absolute;
@@ -103,6 +109,14 @@ body .controls .ss button {
   #mainCanvas {
     width: 100%;
     height: auto;
+  }
+}
+@media screen and (min-width: 480px) {
+  #mainCanvas {
+    max-width: 720px;
+  }
+  .controls {
+    max-width: 720px;
   }
 }
 

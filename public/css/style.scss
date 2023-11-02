@@ -8,11 +8,16 @@
 body {
   display: flex;
   flex-flow: column;
+  flex-direction: column;
+  align-items: center;
   height: 100vh;
+  background-color: #9c98af;
 
   #mainCanvas {
     image-rendering: pixelated;
     background-color: #000;
+    aspect-ratio: 160/144;
+    width: 100%;
   }
 
   .controls {
@@ -20,6 +25,7 @@ body {
     background-color: #d9d9d9;
     position: relative;
     padding: 2rem;
+    width: 100%;
 
     .cross {
       position: absolute;
@@ -115,4 +121,14 @@ body {
     height: auto;
   }
   
+}
+
+@media screen and (min-width: 480px) {
+  #mainCanvas {
+    max-width: 720px;
+  }
+  
+  .controls {
+    max-width: 720px;
+  }
 }

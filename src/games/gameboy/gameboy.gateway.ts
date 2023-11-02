@@ -15,7 +15,8 @@ export class GameboyGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   connected = 0
   clients = new Map<string, number>()
   users = new Map<string, { id: number, inputCount: number, pressed: string[], connectetd: boolean }>()
-  saveJob = new CronJob('0 * * * * *', async () => { await this.saveUsers(this); this.reamdeService.commit(":joystick: Update Gameboy Contributions")})
+  saveJob = new CronJob('0 * * * * *', async () => { await this.saveUsers(this); if (this.needCommit) this.reamdeService.commit(":joystick: Update Gameboy Contributions"); this.needCommit = false})
+  needCommit = false
   lastSendedFrame!: number[]
   constructor(private gameboyService: GameboyService, private authService: AuthService, private redis: RedisService, private reamdeService: ReadmeService){
     this.saveJob.start()
@@ -98,6 +99,7 @@ export class GameboyGateway implements OnGatewayInit, OnGatewayConnection, OnGat
 
   @SubscribeMessage('input')
   async handleMessage(client: any, payload: string[]) {
+    this.needCommit = true
     this.gameboyService.renderInputBoard()
     let userId = this.clients.get(client.id)
     if(!userId) return
