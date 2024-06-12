@@ -86,6 +86,11 @@ export class ChessService implements OnModuleInit {
     
       const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
       utils.getAllPieces(chess.board).forEach(async piece => {
+        const img = await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png')
+        console.log(piece.getImage())
+        img.onload = () => {
+          ctx.drawImage(img, 10, 10, 10, 10)
+        }
         ctx.drawImage(await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png'), piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
       })
     

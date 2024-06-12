@@ -8,7 +8,6 @@ import { ReadmeModule } from './readme/readme.module';
 import { TriggerModule } from './trigger/trigger.module';
 import { ReadmeService } from './readme/readme.service';
 import { RequestModule } from './request/request.module';
-import { FirebaseModule } from './firebase/firebase.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
@@ -26,7 +25,6 @@ import { UsersModule } from './users/users.module';
       rootPath: join(__dirname, '..', '..', 'public'),
     }),
     RequestModule,
-    FirebaseModule,
     RedisModule,
     AuthModule,
     UsersModule,
