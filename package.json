@@ -21,6 +21,7 @@
     "sass:watch": "sass --watch public/css/style.scss:public/css/style.css"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.53",
     "@nestjs/common": "^10.2.7",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.2.7",
@@ -30,7 +31,6 @@
     "@nestjs/schedule": "^3.0.4",
     "@nestjs/serve-static": "^4.0.0",
     "axios": "^1.4.0",
-    "canvas": "^2.11.2",
     "compress-json": "^2.1.2",
     "cron": "^3.1.6",
     "firebase-admin": "^11.10.1",

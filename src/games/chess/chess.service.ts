@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { Chess } from './classes/Chess';
 import { utils } from './classes/utils';
 import { Piece } from './classes/Piece';

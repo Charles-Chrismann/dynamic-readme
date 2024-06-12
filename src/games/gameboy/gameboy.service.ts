@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Readable } from 'stream';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { createCanvas, ImageData } from 'canvas';
+import { createCanvas } from '@napi-rs/canvas';
 import { compress, decompress } from 'compress-json';
 import { Response } from 'express';
 import { Cron } from '@nestjs/schedule';
@@ -79,7 +79,7 @@ export class GameboyService implements OnModuleInit {
     return frames
   }
 
-  frame(res: Response) {
+  async frame(res: Response) {
     const canvas = createCanvas(160, 144)
     const ctx = canvas.getContext('2d')
     let ctx_data = ctx.createImageData(160, 144);
@@ -92,7 +92,7 @@ export class GameboyService implements OnModuleInit {
 
     ctx.putImageData(ctx_data, 0, 0);
 
-    const stream = canvas.createPNGStream()
+    const stream = Readable.from(await canvas.encode('png'))
     res.setHeader('Content-Type', 'image/png')
     res.setHeader('Cache-Control', 'public, max-age=0')
     stream.pipe(res)
@@ -111,7 +111,7 @@ export class GameboyService implements OnModuleInit {
     const canvas = createCanvas(160, 144)
     const ctx = canvas.getContext('2d')
     for(let i = 0; i < this.lastInputFrames.length; i++) {
-      ctx.putImageData(new ImageData(Uint8ClampedArray.from(this.lastInputFrames[i]),160,144), 0, 0);
+      ctx.putImageData(new ImageData(Uint8ClampedArray.from(this.lastInputFrames[i]), 160, 140), 0, 0);
       gifEncoder.addFrame(ctx)
     }
     gifEncoder.finish();

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 const GIFEncoder = require('gifencoder');
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Minesweeper } from './classes/Minesweeper';

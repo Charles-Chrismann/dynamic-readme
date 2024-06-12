@@ -9,7 +9,7 @@ services:
     env_file:
       - .env.dev
     environment:
-      - NO_COMMIT=false
+      - NO_COMMIT=true
     command: npm run start:dev
     ports:
       - 3000:${EC2_PORT}
@@ -18,8 +18,8 @@ services:
     volumes:
       - .:/usr/src/app
     depends_on:
-      - redis
-  redis:
+      - redis-dev
+  redis-dev:
     container_name: dr-dev-redis
     restart: unless-stopped
     image: redis:alpine
