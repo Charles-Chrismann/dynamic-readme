@@ -7,7 +7,7 @@ import { compress, decompress } from 'compress-json';
 import { Response } from 'express';
 import { Cron } from '@nestjs/schedule';
 import { RedisService } from 'src/redis/redis.service';
-const GIFEncoder = require('gifencoder');
+import { GifEncoder } from '@skyra/gifenc';
 const Gameboy = require('serverboy')
 
 const rom = fs.readFileSync(path.join(process.env.PWD, 'roms', process.env.ROM_NAME))
@@ -102,12 +102,12 @@ export class GameboyService implements OnModuleInit {
     res.setHeader('Content-Type', 'image/gif')
     res.setHeader('Cache-Control', 'public, max-age=0')
 
-    const gifEncoder = new GIFEncoder(160, 144)
+    const gifEncoder = new GifEncoder(160, 144)
+    .setRepeat(-1)
+    .setDelay(64)
+    .setQuality(10);
     gifEncoder.createWriteStream().pipe(res)
     gifEncoder.start()
-    gifEncoder.setRepeat(-1);
-    gifEncoder.setDelay(64);
-    gifEncoder.setQuality(10);
     const canvas = createCanvas(160, 144)
     const ctx = canvas.getContext('2d')
     for(let i = 0; i < this.lastInputFrames.length; i++) {

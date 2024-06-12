@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-const GIFEncoder = require('gifencoder');
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Minesweeper } from './classes/Minesweeper';
 import { RedisService } from 'src/redis/redis.service';
 import { commandOptions } from 'redis';
+import { GifEncoder } from '@skyra/gifenc';
 
 @Injectable()
 export class MinesweeperService implements OnModuleInit {
@@ -81,12 +81,12 @@ export class MinesweeperService implements OnModuleInit {
     const images = await Promise.all(imagesPromises)
 
     const tileSize = 16;
-    const gifEncoder = new GIFEncoder(minesweeperData.width * tileSize, minesweeperData.height * tileSize)
+    const gifEncoder = new GifEncoder(minesweeperData.width * tileSize, minesweeperData.height * tileSize)
+    .setRepeat(0)
+    .setDelay(Math.floor(5000 / images.length ?? 1))
+    .setQuality(10)
     gifEncoder.createWriteStream().pipe(fs.createWriteStream('./public/minesweeper.gif'))
     gifEncoder.start()
-    gifEncoder.setRepeat(0)
-    gifEncoder.setDelay(Math.floor(5000 / images.length ?? 1))
-    gifEncoder.setQuality(10)
 
     for(let i = 0; i < images.length; i++) {
       const image = images[i]
