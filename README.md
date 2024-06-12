@@ -21,13 +21,13 @@ git pull
 npm i
 rm -rf dist/
 docker build -t charleschrismann/dynamic-readme:latest .
-docker-compose -f docker-compose.dev.yml --env-file .env.dev up --build
+docker compose -f docker-compose.dev.yml --env-file .env.dev up --build --remove-orphans
 ```
 
 Running in production:
 
 ```sh
-docker-compose -f docker-compose.prod.yml up
+docker compose -f docker-compose.prod.yml up
 ```
 
 delet all volumes

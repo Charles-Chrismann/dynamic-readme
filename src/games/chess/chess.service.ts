@@ -55,12 +55,6 @@ export class ChessService implements OnModuleInit {
   }
 
   async renderBoardImage() {
-    // const canvas = createCanvas(256, 256)
-    // const ctx = canvas.getContext('2d')
-    // const catImage = await loadImage('./src/games/chess/assets/bk.png')
-    // ctx.drawImage(catImage, 0, 0, catImage.width, catImage.height)
-    // const buffer = await canvas.encode('png')
-
     const tileSize = 32;
     const canvas = createCanvas(256, 256)
     const ctx = canvas.getContext('2d')
@@ -90,23 +84,16 @@ export class ChessService implements OnModuleInit {
     }
   
     const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
-    console.log('aaa')
-    await new Promise((resolve, reject) => {
-      utils.getAllPieces(chess.board).forEach(async piece => {
-        const img = await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png')
-        ctx.drawImage(img, piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
-      })
-      console.log('bbb')
-      resolve(null)
-    })
-    console.log('ccc')
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(null)
-      }, 1000)
-    })
-    // const catImage = await loadImage('')
-    // ctx.drawImage(catImage, 0, 0, 0, 0)
+    const piecesMap = new Map()
+    for(const piece of utils.getAllPieces(chess.board)) {
+      const pieceName = piece.getImage()
+      let pieceImg = piecesMap.get(pieceName)
+      if(!pieceImg) {
+        pieceImg = await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png')
+        piecesMap.set(pieceName, pieceImg)
+      }
+      ctx.drawImage(pieceImg, piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
+    }
     const buffer = await canvas.encode('png')
     fs.writeFileSync('./public/board.png', buffer)
   }
