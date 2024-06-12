@@ -55,47 +55,59 @@ export class ChessService implements OnModuleInit {
   }
 
   async renderBoardImage() {
-    const tileSize = 32;
-    const buffer = (await (async () => {
-      const canvas = createCanvas(256, 256)
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#eeeed2'
-      ctx.fillRect(0, 0, 256, 256)
-      
-      ctx.fillStyle = '#769656'
-      
-      let currentColor;
-      for (let i = 0; i < 8; i++) {
-        for (let j = 0; j < 8; j++) {
-          if ((i + j) % 2 === 0) {
-            ctx.fillRect(tileSize * i, tileSize * j, tileSize, tileSize)
-          }
+    // const canvas = createCanvas(256, 256)
+    // const ctx = canvas.getContext('2d')
+    // const catImage = await loadImage('./src/games/chess/assets/bk.png')
+    // ctx.drawImage(catImage, 0, 0, catImage.width, catImage.height)
+    // const buffer = await canvas.encode('png')
 
-          if(j === 7) {
-            currentColor = ctx.fillStyle
-            ctx.fillStyle = i % 2 === 0 ? '#769656' : '#eeeed2'
-            ctx.fillText(String.fromCharCode(97 + i), tileSize * (i + 1) - 6, 253)
-            ctx.fillStyle = currentColor
-          }
-        }
-        currentColor = ctx.fillStyle
-        ctx.fillStyle = i % 2 !== 0 ? '#769656' : '#eeeed2'
-        ctx.fillText(String(8 - i), 1, tileSize * (i + 1) - 24)
-        ctx.fillStyle = currentColor
-      }
+    const tileSize = 32;
+    const canvas = createCanvas(256, 256)
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#eeeed2'
+    ctx.fillRect(0, 0, 256, 256)
     
-      const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
+    ctx.fillStyle = '#769656'
+    
+    let currentColor;
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        if ((i + j) % 2 === 0) {
+          ctx.fillRect(tileSize * i, tileSize * j, tileSize, tileSize)
+        }
+
+        if(j === 7) {
+          currentColor = ctx.fillStyle
+          ctx.fillStyle = i % 2 === 0 ? '#769656' : '#eeeed2'
+          ctx.fillText(String.fromCharCode(97 + i), tileSize * (i + 1) - 6, 253)
+          ctx.fillStyle = currentColor
+        }
+      }
+      currentColor = ctx.fillStyle
+      ctx.fillStyle = i % 2 !== 0 ? '#769656' : '#eeeed2'
+      ctx.fillText(String(8 - i), 1, tileSize * (i + 1) - 24)
+      ctx.fillStyle = currentColor
+    }
+  
+    const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
+    console.log('aaa')
+    await new Promise((resolve, reject) => {
       utils.getAllPieces(chess.board).forEach(async piece => {
         const img = await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png')
-        console.log(piece.getImage())
-        img.onload = () => {
-          ctx.drawImage(img, 10, 10, 10, 10)
-        }
-        ctx.drawImage(await loadImage('./src/games/chess/assets/' + piece.getImage() + '.png'), piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
+        ctx.drawImage(img, piece.x * tileSize, piece.y * tileSize, tileSize, tileSize)
       })
-    
-      return canvas
-    })()).toBuffer('image/png')
+      console.log('bbb')
+      resolve(null)
+    })
+    console.log('ccc')
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(null)
+      }, 1000)
+    })
+    // const catImage = await loadImage('')
+    // ctx.drawImage(catImage, 0, 0, 0, 0)
+    const buffer = await canvas.encode('png')
     fs.writeFileSync('./public/board.png', buffer)
   }
 
