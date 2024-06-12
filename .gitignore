@@ -13,3 +13,5 @@ public/minesweeper.gif
 
 roms/*
 !roms/.gitkeep
+
+package-lock.json
