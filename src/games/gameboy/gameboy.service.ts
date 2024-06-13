@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Readable } from 'stream';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { createCanvas } from '@napi-rs/canvas';
+import { createCanvas, ImageData } from '@napi-rs/canvas';
 import { compress, decompress } from 'compress-json';
 import { Response } from 'express';
 import { Cron } from '@nestjs/schedule';
@@ -86,7 +86,7 @@ export class GameboyService implements OnModuleInit {
 
     const screen = this.gameboy_instance.doFrame()
 
-    for (var i=0; i < screen.length; i++){
+    for (let i=0; i < screen.length; i++){
       ctx_data.data[i] = screen[i];
     }
 
@@ -110,8 +110,12 @@ export class GameboyService implements OnModuleInit {
     gifEncoder.start()
     const canvas = createCanvas(160, 144)
     const ctx = canvas.getContext('2d')
+    let ctx_data = ctx.createImageData(160, 144);
     for(let i = 0; i < this.lastInputFrames.length; i++) {
-      ctx.putImageData(new ImageData(Uint8ClampedArray.from(this.lastInputFrames[i]), 160, 140), 0, 0);
+      for (let j=0; j < this.lastInputFrames[i].length; j++){
+        ctx_data.data[j] = screen[j];
+      }
+      ctx.putImageData(ctx_data, 0, 0);
       gifEncoder.addFrame(ctx)
     }
     gifEncoder.finish();

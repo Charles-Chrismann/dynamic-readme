@@ -43,6 +43,20 @@ redis-cli -h localhost -p 6379
 KEYS *
 ```
 
+Backup
+
+```sh
+docker exec dr-prod-redis redis-cli save
+docker cp dr-prod-redis:/data/dump.rdb ./dump.rdb
+```
+
+Restore
+
+```sh
+docker cp ./dump.rdb dr-prod-redis:/data/dump.rdb
+docker restart dr-prod-redis
+```
+
 note: production file not ready
 
 To add
