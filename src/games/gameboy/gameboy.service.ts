@@ -113,7 +113,7 @@ export class GameboyService implements OnModuleInit {
     let ctx_data = ctx.createImageData(160, 144);
     for(let i = 0; i < this.lastInputFrames.length; i++) {
       for (let j=0; j < this.lastInputFrames[i].length; j++){
-        ctx_data.data[j] = screen[j];
+        ctx_data.data[j] = this.lastInputFrames[i][j];
       }
       ctx.putImageData(ctx_data, 0, 0);
       gifEncoder.addFrame(ctx)
