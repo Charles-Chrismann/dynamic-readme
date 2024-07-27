@@ -205,7 +205,7 @@ export class GbaService implements OnModuleInit {
     str += `  <a href="${BASE_URL}/input?input=2">\n    <img src="./assets/gba/btn-select.png">\n  </a>\n`
     str += `  <a href="${BASE_URL}/input?input=3">\n    <img src="./assets/gba/btn-start.png">\n  </a>\n`
 
-    str += `</p>\n\n$<hr>\n\n`
+    str += `</p>\n\n<hr>\n\n`
 
     return str
   }
