@@ -13,7 +13,7 @@ export class GbaController {
   input(@Query('input') input: string, @Res() res: Response) {
     if(input) this.gbaService.input(+input)
     res.status(200)
-    res.redirect(config.datas.repo.url + '#github-plays-pokemon-')
+    res.redirect(config.datas.repo.url + '#f-zodiac-signs-lets-play-pokemon-together')
   }
 
   @Get('/save')
