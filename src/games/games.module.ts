@@ -12,10 +12,13 @@ import { GameboyService } from './gameboy/gameboy.service';
 import { GameboyGateway } from './gameboy/gameboy.gateway';
 import { AuthModule } from 'src/auth/auth.module';
 
+import { GbaService } from './gba/gba.service';
+import { GbaController } from './gba/gba.controller';
+
 @Module({
   imports: [forwardRef(() => ReadmeModule), RedisModule, AuthModule],
-  controllers: [MinesweeperController, ChessController, WordleController, GameboyController],
-  providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway],
-  exports: [MinesweeperService, ChessService, WordleService, GameboyService]
+  controllers: [MinesweeperController, ChessController, WordleController, GameboyController, GbaController],
+  providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway, GbaService],
+  exports: [MinesweeperService, ChessService, WordleService, GameboyService, GbaService]
 })
 export class GamesModule {}

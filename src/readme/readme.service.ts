@@ -5,7 +5,7 @@ import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
 import { ChessService } from 'src/games/chess/chess.service';
 import { RequestService } from 'src/request/request.service';
 import { WordleService } from 'src/games/wordle/wordle.service';
-import { GameboyService } from 'src/games/gameboy/gameboy.service';
+import { GbaService } from 'src/games/gba/gba.service';
 
 @Injectable()
 export class ReadmeService {
@@ -17,7 +17,7 @@ export class ReadmeService {
     private minesweeperService: MinesweeperService,
     private chessService: ChessService,
     private wordleService: WordleService,
-    private gameboyService: GameboyService
+    private gbaService: GbaService
   ) {
     this.currentContentSha = null;
   }
@@ -40,7 +40,16 @@ export class ReadmeService {
 
     readMeString += `<h1>:wave: - Hi visitor</h1>\n`;
     readMeString += `<h3>I'm ${config.datas.perso.firstname} ${config.datas.perso.lastname} !</h3>\n`;
-    readMeString += config.datas.perso.description.map((line: string | string[]) => 
+
+    if(config.datas.perso.vueCount) readMeString += `<p align="center">\n  <img src="${config.datas.perso.vueCount}">\n</p>\n`
+
+    readMeString += config.datas.perso.description.filter((_, i) => i <= 1).map((line: string | string[]) => 
+      typeof line === "string" ? `<p>${line}</p>\n` : `<ul>\n${line.map((item: string) => `  <li>${item}</li>\n`).join('')}</ul>\n`
+    ).join('');
+
+    readMeString += await this.gbaService.toMd();
+
+    readMeString += config.datas.perso.description.filter((_, i) => i > 1).map((line: string | string[]) => 
       typeof line === "string" ? `<p>${line}</p>\n` : `<ul>\n${line.map((item: string) => `  <li>${item}</li>\n`).join('')}</ul>\n`
     ).join('');
 
@@ -92,7 +101,6 @@ export class ReadmeService {
     }).join('');
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
-    readMeString += await this.gameboyService.toMd();
     readMeString += await this.minesweeperService.toMd();
     readMeString += await this.chessService.toMd();
     readMeString += await this.wordleService.toMd();

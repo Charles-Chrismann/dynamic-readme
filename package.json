@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "dev": "docker compose -f docker-compose.dev.yml --env-file .env.dev up --build --remove-orphans",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -34,6 +35,7 @@
     "axios": "^1.4.0",
     "compress-json": "^2.1.2",
     "cron": "^3.1.6",
+    "gbats": "^1.0.9",
     "lodash-es": "^4.17.21",
     "octokit": "^2.0.14",
     "redis": "^4.6.10",
