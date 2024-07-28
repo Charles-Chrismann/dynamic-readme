@@ -11,9 +11,9 @@ export class GbaController {
 
   @Get('/input')
   input(@Query('input') input: string, @Res() res: Response) {
+    if(input) this.gbaService.input(+input)
     res.status(200)
     res.redirect(config.datas.perso.homepage)
-    if(input) this.gbaService.input(+input)
   }
 
   @Get('/save')
