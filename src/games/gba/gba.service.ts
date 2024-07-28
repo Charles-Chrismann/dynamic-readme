@@ -143,16 +143,7 @@ export class GbaService implements OnModuleInit {
       this.gba_wrapper.frame()
       this.lastInputFrames.push(this.gba_wrapper.getPixels())
     }
-    console.log()
-    console.log(performance.now() - tick)
-
-    // this.skipFrames(300)
-    // this.gba_wrapper.skipFrames(300)
-    // this.lastInputFrames = this.lastInputFrames.concat(this.gba_wrapper.skipFrames(300))
     this.lastInputFrames = this.lastInputFrames.concat(this.skipFrames(300))
-
-
-    console.log(performance.now() - tick)
 
     this.setRenderSession()
   }
