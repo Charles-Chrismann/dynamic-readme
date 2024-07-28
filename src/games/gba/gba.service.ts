@@ -77,11 +77,14 @@ export class GbaService implements OnModuleInit {
     const frames = []
     for(let i = 0; i < n; i++) {
       if(i % 4 === 0) {
+        this.gba_wrapper.setScreen()
         this.gba_wrapper.frame()
         frames.push(this.gba_wrapper.getPixels())
+        this.gba_wrapper.removeScreen()
       }
       else this.gba_wrapper.frame()
     }
+    this.gba_wrapper.setScreen()
     return frames
   }
 
@@ -117,6 +120,7 @@ export class GbaService implements OnModuleInit {
     const canvas = createCanvas(240, 160)
     const ctx = canvas.getContext('2d')
     let ctx_data = ctx.createImageData(240, 160);
+    console.log(this.lastInputFrames.length)
     for(let i = 0; i < this.lastInputFrames.length; i++) {
       for (let j=0; j < this.lastInputFrames[i].length; j++){
         ctx_data.data[j] = this.lastInputFrames[i][j];
@@ -128,6 +132,8 @@ export class GbaService implements OnModuleInit {
   }
 
   input(input: number) {
+
+    const tick = performance.now()
     if(input < 0 || input > 9) return
     this.stopRenderSession()
     this.lastInputFrames = []
@@ -137,8 +143,16 @@ export class GbaService implements OnModuleInit {
       this.gba_wrapper.frame()
       this.lastInputFrames.push(this.gba_wrapper.getPixels())
     }
+    console.log()
+    console.log(performance.now() - tick)
 
+    // this.skipFrames(300)
+    // this.gba_wrapper.skipFrames(300)
+    // this.lastInputFrames = this.lastInputFrames.concat(this.gba_wrapper.skipFrames(300))
     this.lastInputFrames = this.lastInputFrames.concat(this.skipFrames(300))
+
+
+    console.log(performance.now() - tick)
 
     this.setRenderSession()
   }
