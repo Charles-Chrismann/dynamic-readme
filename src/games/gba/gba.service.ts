@@ -38,7 +38,7 @@ export class GbaService implements OnModuleInit {
     this.setRenderSession()
   }
 
-  @Cron('0 0 * * * *')
+  @Cron(process.env.EMU_BACKUP_CRON)
   async backup() {
     this.logger.log('[SHEDULED] Saving gameboy')
     const save = await this.gba_wrapper.createSaveState()
@@ -120,7 +120,6 @@ export class GbaService implements OnModuleInit {
     const canvas = createCanvas(240, 160)
     const ctx = canvas.getContext('2d')
     let ctx_data = ctx.createImageData(240, 160);
-    console.log(this.lastInputFrames.length)
     for(let i = 0; i < this.lastInputFrames.length; i++) {
       for (let j=0; j < this.lastInputFrames[i].length; j++){
         ctx_data.data[j] = this.lastInputFrames[i][j];

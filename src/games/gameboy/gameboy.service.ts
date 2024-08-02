@@ -35,7 +35,7 @@ export class GameboyService implements OnModuleInit {
     }
   }
 
-  @Cron('0 0 * * * *')
+  @Cron(process.env.EMU_BACKUP_CRON)
   async backup() {
     this.logger.log('[SHEDULED] Saving gameboy')
     const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
