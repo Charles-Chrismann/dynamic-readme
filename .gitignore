@@ -2,7 +2,16 @@ node_modules/
 .vscode
 
 dist/
+
 .env
+.env*
+!.env.example
+
 config.json
 public/board.png
 public/minesweeper.gif
+
+roms/*
+!roms/.gitkeep
+
+package-lock.json

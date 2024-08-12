@@ -13,9 +13,25 @@ export class Chess {
   playerTurn = 'white'
   simulationState = false
   status = null // null: game en cours | pat: tie | white/black: winner
-  constructor() {
-    this.createBoard()
-    utils.defineAllLegalMoves(this, this.board)
+  constructor(chessJson?: Record<string, any>) {
+    if(!chessJson) {
+      this.createBoard()
+      utils.defineAllLegalMoves(this, this.board)
+      return this
+    }
+    Object.assign(this, chessJson)
+    this.board = chessJson.board.map(row => row.map(piece => {
+      if(!piece) return null
+      switch(piece.type) {
+        case 'King': return new King(piece.x, piece.y, piece.color, piece.moved)
+        case 'Pawn': return new Pawn(piece.x, piece.y, piece.color, piece.moved, piece.enPassantPossible)
+        case 'Rook': return new Rook(piece.x, piece.y, piece.color) // fix Rook should not move before roke
+        case 'Knight': return new Knight(piece.x, piece.y, piece.color)
+        case 'Bishop': return new Bishop(piece.x, piece.y, piece.color)
+        case 'Queen': return new Queen(piece.x, piece.y, piece.color)
+      }
+    }))
+    return this
   }
 
   createBoard() {
@@ -67,12 +83,17 @@ export class Chess {
     ]
   }
 
-  updateBoard(pieceToMoveCoords, destinationCoords) {
-    if(this.status) return
+  /**
+   * @param pieceToMoveCoords 
+   * @param destinationCoords 
+   * @returns true if the board has been updated false otherwise
+   */
+  updateBoard(pieceToMoveCoords, destinationCoords): boolean {
+    if(this.status) return false
     let pieceToMove = utils.getPiece(pieceToMoveCoords, this.board)
-    if(!pieceToMove) return
-    if(pieceToMove.color !== this.playerTurn) return
-    if(!pieceToMove.legalMoves.find(move => move.x === destinationCoords.x && move.y === destinationCoords.y)) return
+    if(!pieceToMove) return false
+    if(pieceToMove.color !== this.playerTurn) return false
+    if(!pieceToMove.legalMoves) return false
     this.board = utils.computeNextPosition(pieceToMoveCoords, destinationCoords, this.board)
     if(pieceToMove.type === 'Pawn') {
       if(Math.abs(pieceToMoveCoords.y - destinationCoords.y) === 2) this.board[destinationCoords.y][destinationCoords.x].enPassantPossible = true
@@ -91,18 +112,16 @@ export class Chess {
       }
     }
     
-    
     this.board[destinationCoords.y][destinationCoords.x].updateCoords(destinationCoords)
-    utils.toString(this.board)
     this.playerTurn = this.playerTurn === 'white' ? 'black' : 'white'
     utils.defineAllLegalMoves(this, this.board);
     
     // game status check
-    console.log(utils.getPlayerMovesCount(this))
     if(utils.getPlayerMovesCount(this) === 0) {
       if(utils.isKingChecked(utils.getKingOfColor(this.playerTurn, this.board), this.board)) this.status = this.playerTurn === 'black' ? 'white' : 'black'
       else this.status = 'pat'
-      console.log(this.status)
     }
+
+    return true
   }
 }

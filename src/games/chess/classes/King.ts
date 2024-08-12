@@ -5,7 +5,10 @@ import { utils } from './utils'
 export class King extends Piece {
   type = 'King'
   uniqueInitial = 'k'
-  moved = false
+
+  constructor(x: number, y: number, color: 'black' | 'white', public moved = false) {
+    super(x, y, color)
+  }
 
   computeLegalMoves(chessInstance, board) {
     this.legalMoves = [];

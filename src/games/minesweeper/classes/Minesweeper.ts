@@ -7,11 +7,19 @@ export class Minesweeper {
     map = [];
     gameStatus = 'Not Started'
     gameLoosed = false;
-    constructor(width: number, height: number, bombsCount: number) {
-      this.height = height;
-      this.width = width;
-      this.bombsCount = bombsCount;
+    constructor(...setup: [Record<string, any>] | [number, number, number]) {
+      if(setup.length === 1) {
+        const json = setup.shift()
+          Object.assign(this, json)
+          this.map = json.map.map(row => row.map(cell => new Cell(cell.x, cell.y, cell.value, cell.hidden)))
+        return this
+      }
+
+      this.width = setup.shift();
+      this.height = setup.shift();
+      this.bombsCount = setup.shift();
       this.CreateEmptyMap();
+      return this
     }
   
     CreateEmptyMap() {
@@ -32,24 +40,27 @@ export class Minesweeper {
       return this.CellExists(click) ? this.map[click.y][click.x] : null
     }
   
-    HandleClick(click) {
+    HandleClick(click): boolean {
       if(this.gameStatus === 'Not Started') {
         this.PlaceBombs(click);
         this.gameStatus = 'Started';
         let cell = this.GetCell(click)
-        if(!cell) return
+        if(!cell) return false
         this.DiscoverRecursively(cell)
       } else if (this.gameStatus === 'Started') {
         let cell = this.GetCell(click)
-        if(!cell) return
+        if(!cell) return false
         if(cell.value === 9) {
           this.reavealAllBombs()
           this.gameLoosed = true;// loose
           this.gameStatus = "Ended";// loose
-          return
+          return true
+        } else if(!cell.hidden) {
+          return false
         }
         this.DiscoverRecursively(cell)
-      } else if(this.gameStatus === 'Ended') return
+      } else if(this.gameStatus === 'Ended') return false
+      return true
     }
   
     PlaceBombs(click) {
