@@ -5,9 +5,10 @@ import { Chess } from './classes/Chess';
 import { utils } from './classes/utils';
 import { Piece } from './classes/Piece';
 import { RedisService } from 'src/redis/redis.service';
+import IReadmeModule from 'src/declarations/readme-module.interface';
 
 @Injectable()
-export class ChessService implements OnModuleInit {
+export class ChessService implements OnModuleInit, IReadmeModule {
     pieces = {
         Pawn: {
             white: "♙",
@@ -98,20 +99,20 @@ export class ChessService implements OnModuleInit {
     fs.writeFileSync('./public/board.png', buffer)
   }
 
-    private computeMoveString(piece: Piece) {
+    private computeMoveString(piece: Piece, BASE_URL: string) {
         const sqrt = Math.ceil(Math.sqrt(piece.legalMoves.length))
         return piece.legalMoves.map((move, index: number) => {
-            return `${(index % sqrt === 0 && index !== 0) ? "<br>" : ''}<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/move?x1=${piece.x}&y1=${piece.y}&x2=${move.x}&y2=${move.y}">${utils.coordsToBoardCoards({x: move.x, y: move.y})}</a>`
+            return `${(index % sqrt === 0 && index !== 0) ? "<br>" : ''}<a href="${BASE_URL}/chess/move?x1=${piece.x}&y1=${piece.y}&x2=${move.x}&y2=${move.y}">${utils.coordsToBoardCoards({x: move.x, y: move.y})}</a>`
         }).join('\n          ')
     }
 
-  async toMd() {
+  async toMd(BASE_URL: string) {
     const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
     utils.defineAllLegalMoves(chess, chess.board);
 
     let str = `<h3 align="center">A classic Chess</h3>\n`
     this.renderBoardImage()
-    str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/board.png" />\n</p>\n`
+    str += `<p align="center">\n  <img width="256" src="${BASE_URL}/board.png" />\n</p>\n`
 
     if( chess.status === "black" ||
         chess.status === "white"
@@ -124,7 +125,7 @@ export class ChessService implements OnModuleInit {
       chess.board.forEach((row, y) => {
         str += `    <tr>\n      <td align="center">${utils.getletterFromNumber(y)}</td>\n`
         row.forEach((piece) => {
-          str += `      <td align="center">${piece ? (piece.legalMoves.length && piece.color === chess.playerTurn ? `\n        <details>\n          <summary>${this.pieces[piece.type][piece.color]}</summary>\n          ${this.computeMoveString(piece)}\n        </details>\n` : this.pieces[piece.type][piece.color]
+          str += `      <td align="center">${piece ? (piece.legalMoves.length && piece.color === chess.playerTurn ? `\n        <details>\n          <summary>${this.pieces[piece.type][piece.color]}</summary>\n          ${this.computeMoveString(piece, BASE_URL)}\n        </details>\n` : this.pieces[piece.type][piece.color]
         ): "‎ "}      </td>\n`
         })
         str += `    </tr>\n`
@@ -133,7 +134,7 @@ export class ChessService implements OnModuleInit {
       str +=  `  <tr>\n    <td align="center"></td>\n    <td align="center">🇦</td>\n    <td align="center">🇧</td>\n    <td align="center">🇨</td>\n    <td align="center">🇩</td>\n    <td align="center">🇪</td>\n    <td align="center">🇫</td>\n    <td align="center">🇬</td>\n    <td align="center">🇭</td>\n    </tr>\n  </tbody>\n</table>`
     }
 
-    str += `<h3 align="center">\n<a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/chess/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
+    str += `<h3 align="center">\n<a href="${BASE_URL}/chess/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
     return str
   }
 }

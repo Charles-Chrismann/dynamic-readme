@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { five_char_words } from './word_list';
 import * as config from 'config.json';
 import { RedisService } from 'src/redis/redis.service';
+import IReadmeModule from 'src/declarations/readme-module.interface';
 
 @Injectable()
-export class WordleService {
+export class WordleService implements IReadmeModule {
     todayWordle: {
         word: string,
         guessed: boolean,
@@ -101,7 +102,7 @@ export class WordleService {
   }
 
 
-  async toMd(): Promise<string> {
+  async toMd(BASE_URL: string): Promise<string> {
     const todayWordle = JSON.parse(await this.redisService.client.get('wordle'))
     const scoreBoard = JSON.parse(await this.redisService.client.get('wordle-scoreBoard'))
     let str = `<h3 align="center">A classic Wordle</h3>\n`

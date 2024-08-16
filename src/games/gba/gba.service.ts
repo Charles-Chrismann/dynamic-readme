@@ -8,11 +8,12 @@ import { Cron } from '@nestjs/schedule';
 import { RedisService } from 'src/redis/redis.service';
 import { GifEncoder } from '@skyra/gifenc';
 import { Wrapper } from 'gbats';
+import IReadmeModule from 'src/declarations/readme-module.interface';
 
 const rom = fs.readFileSync(path.join(process.env.PWD, 'roms', process.env.ROM_GBA_NAME))
 
 @Injectable()
-export class GbaService implements OnModuleInit {
+export class GbaService implements OnModuleInit, IReadmeModule {
   private readonly logger = new Logger(GbaService.name)
 
   gba_wrapper: Wrapper
@@ -181,33 +182,33 @@ export class GbaService implements OnModuleInit {
     return str
   }
 
-  async toMd() {
-    const BASE_URL = `${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/gba`
+  async toMd(BASE_URL: string) {
+    const BASE_URL_GBA = `${BASE_URL}/gba`
     let str = `<h3 align="center">F*** Zodiac signs, let's play Pokemon together</h3>\n`
     str += `<p align="center">\n`
 
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/top.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/top.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/top-left.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="${BASE_URL}/dogif" width="240" height="160">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/top-right.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/top-left.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="${BASE_URL_GBA}/dogif" width="240" height="160">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/top-right.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/top-bottom.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/top-bottom.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input?input=6">\n    <img src="./assets/gba/btn-up.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/bottom-top-right.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=6">\n    <img src="./assets/gba/btn-up.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/bottom-top-right.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input?input=5">\n    <img src="./assets/gba/btn-left.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/btn-mid.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input?input=4">\n    <img src="./assets/gba/btn-right.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input?input=1">\n    <img src="./assets/gba/btn-b.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input?input=0">\n    <img src="./assets/gba/btn-a.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=5">\n    <img src="./assets/gba/btn-left.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/btn-mid.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=4">\n    <img src="./assets/gba/btn-right.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=1">\n    <img src="./assets/gba/btn-b.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=0">\n    <img src="./assets/gba/btn-a.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input?input=7">\n    <img src="./assets/gba/btn-down.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input">\n    <img src="./assets/gba/reactange.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=7">\n    <img src="./assets/gba/btn-down.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input">\n    <img src="./assets/gba/reactange.png">\n  </a>\n`
     str += `  <br>\n`
-    str += `  <a href="${BASE_URL}/input?input=2">\n    <img src="./assets/gba/btn-select.png">\n  </a>\n`
-    str += `  <a href="${BASE_URL}/input?input=3">\n    <img src="./assets/gba/btn-start.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=2">\n    <img src="./assets/gba/btn-select.png">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA}/input?input=3">\n    <img src="./assets/gba/btn-start.png">\n  </a>\n`
 
     str += `</p>\n\n<hr>\n\n`
 

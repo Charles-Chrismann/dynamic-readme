@@ -5,9 +5,10 @@ import { Minesweeper } from './classes/Minesweeper';
 import { RedisService } from 'src/redis/redis.service';
 import { commandOptions } from 'redis';
 import { GifEncoder } from '@skyra/gifenc';
+import IReadmeModule from 'src/declarations/readme-module.interface';
 
 @Injectable()
-export class MinesweeperService implements OnModuleInit {
+export class MinesweeperService implements OnModuleInit, IReadmeModule {
   constructor(private redisService: RedisService) {}
 
   async onModuleInit() {
@@ -98,22 +99,22 @@ export class MinesweeperService implements OnModuleInit {
     gifEncoder.finish()
   }
 
-  async toMd() {
+  async toMd(BASE_URL: string) {
     this.generatehistoryGif() // asyncrone  mais peux poser un probleme de timing
     
     const minesweeper: Minesweeper = new Minesweeper(JSON.parse(await this.redisService.client.get('minesweeper')))
     let str = `<h3 align="center">A classic Minesweeper</h3>\n`
     str += `<p align="center">\n`
-    str += minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
+    str += minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${BASE_URL}/minesweeper/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
     str += `</p>\n`
     if(minesweeper.gameStatus === "Not Started") str += `<p align="center">Come on, try it</p>\n`
     else if(minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>\n`
     else str += minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>\n` : `<p align="center">Congrats you won !</p>\n`
     
     const historyLength = Object.values(await this.redisService.client.hGetAll(commandOptions({ returnBuffers: true }),'minesweeperImages')).length
-    if(historyLength) str += `<p align="center">\n  <img width="256" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper.gif" />\n</p>\n`
+    if(historyLength) str += `<p align="center">\n  <img width="256" src="${BASE_URL}/minesweeper.gif" />\n</p>\n`
 
-    str += `<h3 align="center">\n  <a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/minesweeper/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
+    str += `<h3 align="center">\n  <a href="${BASE_URL}/minesweeper/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`
 
     return str
   }
