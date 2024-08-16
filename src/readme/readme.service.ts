@@ -35,6 +35,7 @@ export class ReadmeService {
   }
 
   private async render(): Promise<string> {
+    const BASE_URL = `${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}`
     let readMeString = '';
     let skills = config.skills;
 
@@ -47,7 +48,7 @@ export class ReadmeService {
       typeof line === "string" ? `<p>${line}</p>\n` : `<ul>\n${line.map((item: string) => `  <li>${item}</li>\n`).join('')}</ul>\n`
     ).join('');
 
-    readMeString += await this.gbaService.toMd();
+    readMeString += await this.gbaService.toMd(BASE_URL);
 
     readMeString += config.datas.perso.description.filter((_, i) => i > 1).map((line: string | string[]) => 
       typeof line === "string" ? `<p>${line}</p>\n` : `<ul>\n${line.map((item: string) => `  <li>${item}</li>\n`).join('')}</ul>\n`
@@ -59,7 +60,7 @@ export class ReadmeService {
       readMeString += `<h1 align="left">Reach Me</h1>\n`;
       readMeString += `<p align="left">\n`;
       readMeString += config.datas.perso.socials.map((social) => {
-        return `  <a href="${social.profile_url}" target="blank">\n    <img align="center" src="${social.icon_url}" alt="${social.name}" height="30" width="40" />\n  </a>\n`;
+        return `  <a href="${social.profile_url}" target="blank">\n    <img align="center" src="${social.icon_url}" alt="${social.name}" height="40" width="40" />\n  </a>\n`;
       }).join('');
       readMeString += `</p>\n`;
     }
@@ -101,14 +102,14 @@ export class ReadmeService {
     }).join('');
     readMeString += `</p>\n`;
     readMeString += `<h1 align="center">Flex Zone</h1>\n`;
-    readMeString += await this.minesweeperService.toMd();
-    readMeString += await this.chessService.toMd();
-    readMeString += await this.wordleService.toMd();
+    readMeString += await this.minesweeperService.toMd(BASE_URL);
+    readMeString += await this.chessService.toMd(BASE_URL);
+    readMeString += await this.wordleService.toMd(BASE_URL);
 
     readMeString += `<h1 align="center">Work in progress</h1>\n`;
     readMeString += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>\n`;
     readMeString += `<p align="center">To understand how it works, take a look <a href="https://github.com/Charles-Chrismann/dynamic-readme" target="_blank" rel="noreferrer" title="github dynalic readme">here</a></p>\n`;
-    readMeString += `<p align="center">\n  <img align="center" src="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/trigger" alt="work in progress" width="256" />\n</p>\n`;
+    readMeString += `<p align="center">\n  <img align="center" src="${BASE_URL}/trigger" alt="work in progress" width="256" />\n</p>\n`;
     readMeString += `<p align="center">\n  <a href="https://github.com/${config.datas.repo.owner}">See ya <3</a>\n</p>\n`;
     let currentDate = new Date();
     const days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -147,7 +148,11 @@ export class ReadmeService {
       )).data.sha;
     }
 
-    const buffer = Buffer.from(await this.render());
+    const readmeContent = await this.render()
+
+    console.log(readmeContent)
+
+    const buffer = Buffer.from(readmeContent);
     const base64 = buffer.toString('base64');
     if(process.env.NO_COMMIT === "true") return
     let pushRespSha: string

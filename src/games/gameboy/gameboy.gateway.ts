@@ -100,7 +100,8 @@ export class GameboyGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   @SubscribeMessage('input')
   async handleMessage(client: any, payload: string[]) {
     this.needCommit = true
-    this.gameboyService.renderInputBoard()
+    const BASE_URL = `${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}`
+    this.gameboyService.renderInputBoard(BASE_URL)
     let userId = this.clients.get(client.id)
     if(!userId) return
     let userAction = this.users.get(String(userId)) ?? { id: userId, inputCount: 0, pressed: [] as string[], connectetd: true }
