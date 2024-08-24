@@ -10,7 +10,7 @@ services:
       - NODE_ENV=production
     command: npm run start:prod
     ports:
-      - ${DOCKER_LOCAL_PORT}:${EC2_PORT}
+      - ${DOCKER_LOCAL_PORT}:${APP_PORT}
     networks:
       - app-network-prod
     volumes:

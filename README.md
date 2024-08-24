@@ -83,6 +83,80 @@ docker restart dr-prod-redis
 note: production file not ready
 
 To add
+
 screenshot of the game
+
 playing time
+
 disable some games/modules
+
+upgrade config.md
+
+ui to update the config file without restarting the app
+
+provide a raw module for the config file
+
+make dynamic/followers independant from trigger 
+
+make tigger content configurable
+
+add 3third party such as github statistics 
+
+fix dynamic/followers last works
+
+implement the `scoreboard` options in games/gba
+
+add steps for configurate each module
+- gba
+
+Add options for the minesweeper, width, height
+
+Add default config files `config.default.json`
+
+for games with a reset option button, switch to:
+
+```jsonc
+{
+  "reset": {
+    "display": true,
+    "content": "reset game"
+  }
+}
+
+```
+
+Add hide reset btn for chess, and protect the reset route
+
+Add hide reset btn for Minesweeper, and protect the reset route
+
+UI for manage the app, reset games, with authentitcation
+
+protect the reset route for wordle
+
+add issue template
+
+add multiple backup for gba + screen/gif of la view
+
+add wordle custom response in case of bad submission (too long/ invalid)
+
+add display scoreboard for gab
+
+add ui + connection live play for gba
+
+add display scoreboard for game boy color
+
+add display scoreboard for wordle
+
+create a full configuration tutorial for each module
+
+add thing to think on vm such as date for wordle reset for example
+
+add license
+
+switch chess to chess.js
+
+add chess plays orders
+
+add chess game progress
+
+add a save-reset for the app (functions that return a zip, that can be provided to a blank app to return to the at time created zip without reconfiguring)

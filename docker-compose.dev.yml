@@ -12,7 +12,7 @@ services:
       - NO_COMMIT=true
     command: npm run start:dev
     ports:
-      - 3000:${EC2_PORT}
+      - 3000:${APP_PORT}
     networks:
       - app-network
     volumes:
