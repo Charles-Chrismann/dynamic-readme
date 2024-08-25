@@ -106,7 +106,7 @@ export class ChessService implements OnModuleInit, IReadmeModule {
         }).join('\n          ')
     }
 
-  async toMd(BASE_URL: string) {
+  async toMd(BASE_URL: string, data: any, options: any) {
     const chess = new Chess(JSON.parse(await this.redisService.client.get('chess')))
     utils.defineAllLegalMoves(chess, chess.board);
 
