@@ -160,3 +160,9 @@ add chess plays orders
 add chess game progress
 
 add a save-reset for the app (functions that return a zip, that can be provided to a blank app to return to the at time created zip without reconfiguring)
+
+check config script
+
+add json compress config
+
+make it publishable on dockerhub (volume for config.json)

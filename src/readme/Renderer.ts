@@ -182,8 +182,6 @@ class Renderer {
       parts.push(`<p align="right">Generated in ${(Date.now() - this.startRenderDate) / 1000}s on ${days[currentDate.getDay()]} ${months[currentDate.getMonth()]} ${currentDate.getDate()} at ${currentDate.getHours()}:${currentDate.getMinutes().toString().padStart(2, '0')}</p>\n`);
     }
 
-    console.log(parts.join(''))
-
     return parts.join('')
   }
 }
