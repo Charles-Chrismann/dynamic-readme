@@ -176,7 +176,7 @@ export class GbaService implements OnModuleInit, IReadmeModule {
     const users = await Promise.all(players.map(player => this.redis.client.hGetAll(`user:${player.id}`)))
     const rowsDatas = players.map((player, index) => ({...player, ...users[index]})).sort((a, b) => +b.inputCount - +a.inputCount)
     str += rowsDatas.map((row, i) => `    <tr>\n      <td align="center">${i + 1}</td>\n      <td align="center"><a href="https://github.com/${row.login}"><img src="${row.avatar_url}" alt="profil picture" width="40"></img></td>\n      <td align="center"><a href="https://github.com/${row.login}">@${row.login}</a></td>\n      <td align="center">${row.inputCount}</td>\n    </tr>\n`).join('')
-    str += `    <tr>\n      <td colspan="4" align="center"><a href="${process.env.EC2_PROTOCOL}://${process.env.EC2_SUB_DOMAIN}.${process.env.EC2_DOMAIN}/client.html">Play with your Github account here !</a></td>\n    </tr>\n`
+    str += `    <tr>\n      <td colspan="4" align="center"><a href="${process.env.APP_PROTOCOL}://${process.env.APP_SUB_DOMAIN}.${process.env.APP_DOMAIN}/client.html">Play with your Github account here !</a></td>\n    </tr>\n`
     str += `  </tbody>\n</table>\n\n`
 
     return str
