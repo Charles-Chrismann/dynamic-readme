@@ -138,7 +138,9 @@ add multiple backup for gba + screen/gif of la view
 
 add wordle custom response in case of bad submission (too long/ invalid)
 
-add wordle responve include wordle tab
+add wordle responve include wordle 
+
+add wordle way to submit a new guess as a response of an issue
 
 add display scoreboard for gab
 
