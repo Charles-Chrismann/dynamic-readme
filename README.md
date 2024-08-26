@@ -152,8 +152,6 @@ create a full configuration tutorial for each module
 
 add thing to think on vm such as date for wordle reset for example
 
-add license
-
 switch chess to chess.js
 
 add chess plays orders
