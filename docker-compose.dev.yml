@@ -3,6 +3,13 @@ services:
   dynamic-readme:
     container_name: dr-dev-app
     restart: unless-stopped
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /usr/src/app
+    volumes:
+      - ./config.json:/usr/src/app/config.json
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,8 +22,6 @@ services:
       - 3000:${APP_PORT}
     networks:
       - app-network
-    volumes:
-      - .:/usr/src/app
     depends_on:
       - redis-dev
   redis-dev:

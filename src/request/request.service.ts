@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import * as config from '../../config.json';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class RequestService {
     public lastFollowers: {followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]} = {followerCount: 0, lastFollowers: []}
 
-    constructor() {
-        this.getFollowers(3).then((followers) => {
-            this.lastFollowers = followers
-    })}
+    constructor(
+      private configService: ConfigService
+    ) {
+      this.getFollowers(3).then((followers) => {
+        this.lastFollowers = followers
+      })
+    }
 
     async getFollowers(limit: number): Promise<{followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]}> {
+      const {config} = this.configService
         try {
             const query = `
                 query {

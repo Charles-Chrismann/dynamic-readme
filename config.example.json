@@ -1,71 +1,93 @@
 {
-    "datas": {
-      "repo": {
-        "name": "Charles-Chrismann",
-        "owner": "Charles-Chrismann",
-        "url": "https://github.com/Charles-Chrismann/Charles-Chrismann/",
-        "readme": {
-          "path": "README.md"
-        },
-        "commit": {
-          "message": ":building_construction: UPDATE README.md"
-        }
-      },
-      "perso": {
-        "homepage": "https://github.com/Charles-Chrismann",
-        "username": "charles-chrismann",
-        "vueCount": "https://komarev.com/ghpvc/?username=Charles-Chrismann",
-        "firstname": "Charles",
-        "lastname": "Chrismann",
-        "description": [
-          "I'm a french student in 2nd year in web development at <a href=\"https://www.iim.fr\" target=\"_blank\" rel=\"noreferrer\" title=\"Institut de l'Internet et du Multimédia\">IIM DigitalSchool</a> in Paris.",
-          [
-            "My list item #1",
-            "My list item #2"
-          ]
-        ],
-        "socials": [
-          {
-            "name": "linkedin",
-            "profile_url": "https://www.linkedin.com/in/charles-chrismann/",
-            "icon_url": "https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg"
-          }
-        ]
+  "structure": [
+    {
+      "id": "static/element",
+      "data": {
+        "element": "h3",
+        "content": "Hi there 👋"
       }
     },
-    "skills": {
-      "learning": [],
-      "front": [
-        {
-          "name": "JavaScript",
-          "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
-          "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg",
-          "alt": "javascript"
-        }
+    {
+      "id": "static/list",
+      "data": {
+        "field": "perso.facts"
+      }
+    }
+  ],
+  "datas": {
+    "repo": {
+      "name": "Charles-Chrismann",
+      "owner": "Charles-Chrismann",
+      "url": "https://github.com/Charles-Chrismann/Charles-Chrismann/",
+      "readme": {
+        "path": "README.md"
+      },
+      "commit": {
+        "message": ":building_construction: UPDATE README.md"
+      }
+    },
+    "perso": {
+      "homepage": "https://github.com/Charles-Chrismann",
+      "username": "charles-chrismann",
+      "vueCount": "https://komarev.com/ghpvc/?username=Charles-Chrismann",
+      "firstname": "Charles",
+      "lastname": "Chrismann",
+      "description": [
+        "I'm a french student in 2nd year in web development at <a href=\"https://www.iim.fr\" target=\"_blank\" rel=\"noreferrer\" title=\"Institut de l'Internet et du Multimédia\">IIM DigitalSchool</a> in Paris.",
+        [
+          "My list item #1",
+          "My list item #2"
+        ]
       ],
-      "back": [
+      "facts": {
+        "content": [
+          "🔭 I’m currently working on something cool!",
+          "🌱 I’m currently learning with help from <a href=\"https://docs.github.com/\">docs.github.com</a>",
+          "💬 Ask me about GitHub"
+        ]
+      },
+      "socials": [
         {
-          "name": "Node Js",
-          "url": "https://nodejs.org",
-          "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg",
-          "alt": "nodejs"
-        }
-      ],
-      "notions": [
-        {
-          "name": "Nest Js",
-          "url": "https://nestjs.com/",
-          "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/nestjs/nestjs-plain.svg",
-          "alt": "nestjs"
-        }
-      ],
-      "tools": [
-        {
-          "name": "Git",
-          "url": "https://git-scm.com/",
-          "src": "https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg",
-          "alt": "git"
+          "name": "linkedin",
+          "profile_url": "https://www.linkedin.com/in/charles-chrismann/",
+          "icon_url": "https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg"
         }
       ]
     }
+  },
+  "skills": {
+    "learning": [],
+    "front": [
+      {
+        "name": "JavaScript",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+        "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg",
+        "alt": "javascript"
+      }
+    ],
+    "back": [
+      {
+        "name": "Node Js",
+        "url": "https://nodejs.org",
+        "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original-wordmark.svg",
+        "alt": "nodejs"
+      }
+    ],
+    "notions": [
+      {
+        "name": "Nest Js",
+        "url": "https://nestjs.com/",
+        "src": "https://raw.githubusercontent.com/devicons/devicon/master/icons/nestjs/nestjs-plain.svg",
+        "alt": "nestjs"
+      }
+    ],
+    "tools": [
+      {
+        "name": "Git",
+        "url": "https://git-scm.com/",
+        "src": "https://www.vectorlogo.zone/logos/git-scm/git-scm-icon.svg",
+        "alt": "git"
+      }
+    ]
   }
+}

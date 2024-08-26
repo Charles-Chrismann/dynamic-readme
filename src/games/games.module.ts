@@ -11,6 +11,7 @@ import { GameboyController } from './gameboy/gameboy.controller';
 import { GameboyService } from './gameboy/gameboy.service';
 import { GameboyGateway } from './gameboy/gameboy.gateway';
 import { AuthModule } from 'src/auth/auth.module';
+import { ConfigService } from 'src/config/config.service';
 
 import { GbaService } from './gba/gba.service';
 import { GbaController } from './gba/gba.controller';
@@ -18,7 +19,7 @@ import { GbaController } from './gba/gba.controller';
 @Module({
   imports: [forwardRef(() => ReadmeModule), RedisModule, AuthModule],
   controllers: [MinesweeperController, ChessController, WordleController, GameboyController, GbaController],
-  providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway, GbaService],
+  providers: [MinesweeperService, ChessService, WordleService, GameboyService, GameboyGateway, GbaService, ConfigService],
   exports: [MinesweeperService, ChessService, WordleService, GameboyService, GbaService]
 })
 export class GamesModule {}

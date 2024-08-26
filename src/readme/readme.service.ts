@@ -1,12 +1,12 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Octokit } from 'octokit';
-import * as config from '../../config.json';
 import { MinesweeperService } from 'src/games/minesweeper/minesweeper.service';
 import { ChessService } from 'src/games/chess/chess.service';
 import { RequestService } from 'src/request/request.service';
 import { WordleService } from 'src/games/wordle/wordle.service';
 import { GbaService } from 'src/games/gba/gba.service';
 import renderer from './Renderer';
+import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
 export class ReadmeService {
@@ -14,6 +14,7 @@ export class ReadmeService {
   startDateRender: number;
 
   constructor(
+    private configService: ConfigService,
     private requestService: RequestService,
     private minesweeperService: MinesweeperService,
     private chessService: ChessService,
@@ -29,6 +30,7 @@ export class ReadmeService {
   }
 
   async push(octokit: Octokit, message: string, content: string, sha: string): Promise<string> {
+    const {config} = this.configService
     return (await octokit.request(
       `PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
       {
@@ -47,6 +49,7 @@ export class ReadmeService {
   }
 
   async commit(commitMessage: string) {
+    const {config} = this.configService
     this.startDateRender = Date.now();
     const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 

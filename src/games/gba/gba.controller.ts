@@ -1,16 +1,20 @@
 import { Body, Controller, Get, Param, Post, Query, RawBodyRequest, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as config from '../../../config.json';
 import { GbaService } from './gba.service';
 import * as rawbody from 'raw-body';
+import { ConfigService } from 'src/config/config.service';
 
 @Controller('gba')
 export class GbaController {
 
-  constructor(private gbaService: GbaService){}
+  constructor(
+    private configService: ConfigService,
+    private gbaService: GbaService
+  ){}
 
   @Get('/input')
   input(@Query('input') input: string, @Res() res: Response) {
+    const {config} = this.configService
     res.status(200)
     res.redirect(config.datas.perso.homepage)
     if(input) this.gbaService.input(+input)

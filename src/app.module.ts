@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { UsersModule } from './users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ReadmeService],
+  providers: [AppService, ReadmeService, ConfigService],
 })
 export class AppModule {}
