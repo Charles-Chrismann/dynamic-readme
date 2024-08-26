@@ -3,7 +3,9 @@ services:
   dynamic-readme-prod:
     container_name: dr-prod-app
     restart: unless-stopped
-    image: charleschrismann/dynamic-readme:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
     environment:
@@ -14,7 +16,7 @@ services:
     networks:
       - app-network-prod
     volumes:
-      - .:/usr/src/app
+      - ./config.json:/usr/src/app/config.json
     depends_on:
       - redis-prod
   redis-prod:

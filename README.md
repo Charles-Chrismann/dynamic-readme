@@ -20,40 +20,43 @@ This results in a seemingly simple page refresh for the user.
 
 ## Setup
 
+Requirements:
+  - Docker
+
 Steps:
 1. git clone https://github.com/Charles-Chrismann/dynamic-readme
-3. npm i
 4. dupe .env.example and rename it .env, fill variables
 4. dupe config.example.json and rename it config.json, fill variables
-5. scp ./the-rom.gb user@ip:~/dynamic-readme/roms/pr.gb (from local terminal)
+5. dl roms and put them in the `roms` folder
 
 ## Developpement
 
-Requirements:
-  - Docker
-  - docker compose
-
-Running in developpement:
-
 ```sh
-git pull
-npm i
-rm -rf dist/
-docker build -t charleschrismann/dynamic-readme:latest .
-docker compose -f docker-compose.dev.yml --env-file .env.dev up --build --remove-orphans
+npm run dev
 ```
 
-Running in production:
+equivalent to: `docker compose -f docker-compose.dev.yml up --watch`
+
+> you might need to trigger the hot reload to get the latest version of the app.
+
+## Production
 
 ```sh
-docker compose -f docker-compose.prod.yml up
+npm run prod
 ```
+
+equivalent to: `docker compose -f docker-compose.prod.yml up --build -d`
+
+## Utility commands
 
 delet all volumes
 
 ```sh
 docker compose -f docker-compose.dev.yml --env-file .env.dev down -v
 ```
+
+docker system df
+docker builder prune
 
 redis cli
 
@@ -78,7 +81,7 @@ docker restart dr-prod-redis
 
 note: production file not ready
 
-To add
+## To add
 
 screenshot of the game
 
@@ -135,6 +138,8 @@ add multiple backup for gba + screen/gif of la view
 
 add wordle custom response in case of bad submission (too long/ invalid)
 
+add wordle responve include wordle tab
+
 add display scoreboard for gab
 
 add ui + connection live play for gba
@@ -160,3 +165,13 @@ check config script
 add json compress config
 
 make it publishable on dockerhub (volume for config.json)
+
+add single `config` folder
+
+make roms optionnal
+
+complete setup steps
+
+explain env variables
+
+better readme (illustrations)

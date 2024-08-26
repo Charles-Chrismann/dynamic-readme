@@ -1,17 +1,22 @@
 import { RequestService } from "src/request/request.service"
-import * as config from "../../config.json"
 import { ChessService } from "src/games/chess/chess.service"
 import { GameboyService } from "src/games/gameboy/gameboy.service"
 import { GbaService } from "src/games/gba/gba.service"
 import { MinesweeperService } from "src/games/minesweeper/minesweeper.service"
 import { WordleService } from "src/games/wordle/wordle.service"
+import * as fs from 'fs'
+import Config from "src/declarations/config.interface"
 
 class Module {
   value: string
 
-  constructor(private parent: Renderer, public flat: any) {}
+  constructor(
+    private parent: Renderer,
+    public flat: any
+  ) {}
 
   render() {
+    const {config} = this.parent
     if(this.value) return this.value
 
     const {id, data, options} = this.flat
@@ -45,7 +50,7 @@ class Module {
 
       const {title, content} = list
 
-      this.value = `<p>${title}</p>\n<ul>${content.map(l => `  <li>${l}</li>\n`).join('')}</ul>\n`
+      this.value = `${title ? `<p>${title}</p>\n` : ''}<ul>\n${content.map(l => `  <li>${l}</li>\n`).join('')}</ul>\n`
     }
     else if(id === "static/socials") {
       let readMeString = ''
@@ -155,11 +160,14 @@ class Renderer {
   services = new Map<string, RequestService | ChessService | GameboyService | GbaService | MinesweeperService | WordleService>()
   structure: (Module | AsyncModule)[]
   startRenderDate: number
+  config: Config
   constructor() {
+    this.config = JSON.parse(fs.readFileSync('./config.json').toString())
     this.createStructure()
   }
 
   createStructure() {
+    const {config} = this
     this.structure = config.structure.filter(m => !m?.disabled).map(flatModule => {
       if(
         flatModule.id === "trigger"
