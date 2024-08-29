@@ -23,7 +23,7 @@ import { ConfigService } from './config/config.service';
     ReadmeModule,
     TriggerModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'public'),
+      rootPath: join(__dirname, '..', 'public'),
     }),
     RequestModule,
     RedisModule,
