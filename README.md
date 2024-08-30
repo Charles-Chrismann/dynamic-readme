@@ -177,3 +177,7 @@ complete setup steps
 explain env variables
 
 better readme (illustrations)
+
+add badge support for contact module
+
+add custom title for contact module
