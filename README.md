@@ -181,3 +181,5 @@ better readme (illustrations)
 add badge support for contact module
 
 add custom title for contact module
+
+add admin dashboard
