@@ -82,19 +82,21 @@ export class MinesweeperService implements OnModuleInit, IReadmeModule {
     const images = await Promise.all(imagesPromises)
 
     const tileSize = 16;
-    const gifEncoder = new GifEncoder(minesweeperData.width * tileSize, minesweeperData.height * tileSize)
+    const canvasWidth = minesweeperData.width * tileSize
+    const canvasHeight = minesweeperData.height * tileSize
+    const gifEncoder = new GifEncoder(canvasWidth, canvasHeight)
     .setRepeat(0)
-    .setDelay(Math.floor(5000 / images.length ?? 1))
+    .setDelay(Math.floor(5000 / images.length || 1))
     .setQuality(10)
     gifEncoder.createWriteStream().pipe(fs.createWriteStream('./public/minesweeper.gif'))
     gifEncoder.start()
 
     for(let i = 0; i < images.length; i++) {
       const image = images[i]
-      const canvas = createCanvas(tileSize * minesweeperData.width, tileSize * minesweeperData.height)
+      const canvas = createCanvas(canvasWidth, canvasHeight)
       const ctx = canvas.getContext('2d')
       ctx.drawImage(image, 0, 0)
-      gifEncoder.addFrame(ctx)
+      gifEncoder.addFrame(ctx.getImageData(0, 0, canvasWidth, canvasHeight).data)
     }
     gifEncoder.finish()
   }

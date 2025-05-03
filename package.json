@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "docker compose -f docker-compose.dev.yml up --watch",
+    "dev": "docker compose -f docker-compose.dev.yml --env-file .env.dev up --watch ",
     "prod": "docker compose -f docker-compose.prod.yml up --build -d",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -117,7 +117,7 @@ export class GameboyService implements OnModuleInit, IReadmeModule {
         ctx_data.data[j] = this.lastInputFrames[i][j];
       }
       ctx.putImageData(ctx_data, 0, 0);
-      gifEncoder.addFrame(ctx)
+      gifEncoder.addFrame(ctx.getImageData(0, 0, 160, 144).data)
     }
     gifEncoder.finish();
   }

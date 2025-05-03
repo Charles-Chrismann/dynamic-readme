@@ -20,8 +20,9 @@ class Module {
     if(this.value) return this.value
 
     const {id, data, options} = this.flat
-
+    console.log(id)
     if(id === "static/element") this.value = `<${data.element}${options?.align ? ` align="${options?.align}"` : `` }>${data.content}</${data.element}>\n`
+    else if(id === "static/raw") this.value = data.content + ((data.content as string).endsWith('\n') ? "" : "\n")
     else if(id === "static/greeting") this.value = `<h3>I'm ${config.datas.perso.firstname} ${config.datas.perso.lastname} !</h3>\n`
     else if(id === "3rdParty/profileViews") this.value = `<p align="center">\n  <img src="${config.datas.perso.vueCount}">\n</p>\n`
     else if(id === "static/lines") {

@@ -64,10 +64,14 @@ export class ReadmeService {
 
     const buffer = Buffer.from(readmeContent);
     const base64 = buffer.toString('base64');
-    if(process.env.NO_COMMIT === "true") return
+    if(process.env.NO_COMMIT === "true") {
+      console.log(readmeContent)
+      return
+    }
     let pushRespSha: string
     try {
       pushRespSha = await this.push(octokit, commitMessage, base64, sha)
+      console.log(readmeContent)
     } catch (e) {
       this.currentContentSha = (await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)).data.sha
       pushRespSha = await this.push(octokit, commitMessage, base64, this.currentContentSha)
