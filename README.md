@@ -180,6 +180,10 @@ better readme (illustrations)
 
 add badge support for contact module
 
-add custom title for contact module
+add custom title for contact (reach me) module
 
 add admin dashboard
+
+disable game schedule if not runned
+
+add possibiity to disable games (gameboy service should not save if not displayed) & support for resume
