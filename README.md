@@ -187,3 +187,5 @@ add admin dashboard
 disable game schedule if not runned
 
 add possibiity to disable games (gameboy service should not save if not displayed) & support for resume
+
+add theme configuration with colors and style buttons
