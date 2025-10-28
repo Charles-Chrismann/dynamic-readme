@@ -173,7 +173,7 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
   }
 
   async toMd() {
-    const BASE_URL_GBA = `${process.env.APP_PROTOCOL}://${process.env.APP_SUB_DOMAIN}.${process.env.APP_DOMAIN}/gba`
+    const BASE_URL_GBA = `${AppConfigService.APP_BASE_URL}/gba`
     const env = AppConfigService.getOrThrow<string>('NODE_ENV')
     const BASE_URL_GBA_WITH_ID = 
       env === "production"
