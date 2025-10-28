@@ -1,30 +1,43 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller,
+  Get,
+  Header,
+  Param,
+  Query,
+  Res
+} from '@nestjs/common';
 import { Response } from 'express';
 import { MinesweeperService } from './minesweeper.service';
-import { ReadmeService } from 'src/readme/readme.service';
-import { ConfigService } from 'src/config/config.service';
 
 @Controller('minesweeper')
 export class MinesweeperController {
-    constructor(
-      private configService: ConfigService,
-      private minesweeperService: MinesweeperService,
-      private readmeService: ReadmeService
-    ) {}
-    @Get('new')
-    async new(@Res() res: Response) {
-      const {config} = this.configService
-      await this.minesweeperService.new()
-      await this.readmeService.commit(':boom: Reset minesweeper')
-      res.status(200)
-      res.redirect(config.datas.repo.url + '#a-classic-minesweeper')
-    }
+  constructor(
+    private minesweeperService: MinesweeperService
+  ) {}
+  @Get(':id/new')
+  async new(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    return this.minesweeperService.new(id, res)
+  }
 
-    @Get('click')
-    async click(@Query('x') x: string, @Query('y') y: string, @Res() res: Response){
-      const {config} = this.configService
-      if(await this.minesweeperService.click(+x, +y)) await this.readmeService.commit(':boom: Update minesweeper')
-      res.status(200)
-      res.redirect(config.datas.repo.url + '#a-classic-minesweeper')
-    }
+  @Get(':id/click')
+  async click(
+    @Param('id') id: string,
+    @Query('x') x: string,
+    @Query('y') y: string,
+    @Res() res: Response
+  ){
+    return this.minesweeperService.click(id, +x, +y, res)
+  }
+
+  @Get(':id/gif')
+  @Header('Cache-Control', 'public, max-age=0')
+  @Header('Content-Type', 'image/gif')
+  async gif(
+    @Param('id') id: string,
+    @Res() res: Response
+  ){
+    return this.minesweeperService.gif(id, res)
+  }
 }

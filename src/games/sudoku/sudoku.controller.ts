@@ -1,7 +1,7 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { SudokuService } from './sudoku.service';
 import { Response } from 'express';
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('sudoku')
 export class SudokuController {
@@ -12,7 +12,7 @@ export class SudokuController {
 
     @Get('new')
     new(@Res() res: Response) {
-      const {config} = this.configService
+      const config = this.configService.getOrThrow('config')
       this.sudokuService.new()
       // await this.readmeService.commit(':1234: Reset sudoku')
       res.status(200)
@@ -21,7 +21,7 @@ export class SudokuController {
 
     @Get('number')
     number(@Res() res: Response) {
-      const {config} = this.configService
+      const config = this.configService.getOrThrow('config')
       this.sudokuService.new()
       // await this.readmeService.commit(':1234: Update sudoku')
       res.status(200)

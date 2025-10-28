@@ -1,4 +1,4 @@
-const five_char_words = [
+const FIVE_CHAR_WORDS = [
   'CIGAR',
   'REBUT',
   'SISSY',
@@ -2317,4 +2317,4 @@ const five_char_words = [
   'SHAVE',
 ];
 
-export { five_char_words };
+export { FIVE_CHAR_WORDS };

@@ -1,30 +1,45 @@
-import { Controller, Get, Request, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Param,
+  Query,
+  Res
+} from '@nestjs/common';
 import { ChessService } from './chess.service';
 import { Response } from 'express'
-import { ReadmeService } from 'src/readme/readme.service';
-import { ConfigService } from 'src/config/config.service';
+import { ChessCoordinates } from './declarations';
 
 @Controller('chess')
 export class ChessController {
-    constructor(
-      private configService: ConfigService,
-      private chessService: ChessService,
-      private readmeService: ReadmeService
-    ) {}
-    @Get('new')
-    async new(@Res() res: Response) {
-      const {config} = this.configService
-      this.chessService.new()
-      await this.readmeService.commit(':chess_pawn: Reset chess')
-      res.status(200)
-      res.redirect(config.datas.repo.url + '#a-classic-chess')
-    }
+  constructor(
+    private chessService: ChessService
+  ) { }
+  @Get(':id/new')
+  async new(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    return this.chessService.new(id, res)
+  }
 
-    @Get('move')
-    async move(@Res() res: Response, @Request() req) {
-      const {config} = this.configService
-      if(this.chessService.move(req)) await this.readmeService.commit(':chess_pawn: Update chess')
-      res.status(200)
-      res.redirect(config.datas.repo.url + '#a-classic-chess')
-    }
+  @Get(':id/move')
+  async move(
+    @Param('id') id: string,
+    @Query('from') from: ChessCoordinates,
+    @Query('to') to: ChessCoordinates,
+    @Res() res: Response,
+  ) {
+    return this.chessService.move(id, { from, to }, res)  
+  }
+
+  @Get(':id/board')
+  @Header('Content-Type', 'image/png')
+  @Header('Cache-Control', 'public, max-age=0')
+  board(
+    @Param('id') id: string,
+    @Res() res: Response
+  ) {
+    return this.chessService.board(id, res)
+  }
 }

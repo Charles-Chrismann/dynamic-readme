@@ -1,21 +1,17 @@
-import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { ConfigService } from 'src/config/config.service';
+import { AppConfigService } from './ConfigService';
 
-@Injectable()
-export class RequestService {
+class RequestService {
     public lastFollowers: {followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]} = {followerCount: 0, lastFollowers: []}
 
-    constructor(
-      private configService: ConfigService
-    ) {
-      this.getFollowers(3).then((followers) => {
-        this.lastFollowers = followers
-      })
+    constructor() {}
+
+    async init() {
+        this.lastFollowers = await this.getFollowers(3)
     }
 
     async getFollowers(limit: number): Promise<{followerCount: number, lastFollowers: {login: string, avatarUrl: string}[]}> {
-      const {config} = this.configService
+      const config = AppConfigService.getOrThrow('config')
         try {
             const query = `
                 query {
@@ -46,3 +42,5 @@ export class RequestService {
         }
     }
 }
+
+export default new RequestService() 

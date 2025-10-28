@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "docker compose -f docker-compose.dev.yml --env-file .env.dev up --watch ",
+    "dev": "docker compose -f docker-compose.dev.yml --env-file .env.dev up --watch",
     "prod": "docker compose -f docker-compose.prod.yml up --build -d",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -34,6 +34,7 @@
     "@nestjs/serve-static": "^4.0.0",
     "@skyra/gifenc": "^1.0.1",
     "axios": "^1.4.0",
+    "chess.js": "^1.4.0",
     "compress-json": "^2.1.2",
     "cron": "^3.1.6",
     "gbats": "^1.0.9",
@@ -41,7 +42,8 @@
     "octokit": "^2.0.14",
     "redis": "^4.6.10",
     "rxjs": "^7.2.0",
-    "serverboy": "gitlab:piglet-plays/serverboy.js"
+    "serverboy": "gitlab:piglet-plays/serverboy.js",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
@@ -52,6 +54,7 @@
     "@types/jest": "29.2.4",
     "@types/lodash": "^4.14.194",
     "@types/lodash-es": "^4.17.7",
+    "@types/multer": "^2.0.0",
     "@types/node": "^18.11.18",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -67,7 +70,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.1.1",
-    "typescript": "^4.7.4"
+    "typescript": "^5.9.2"
   },
   "jest": {
     "moduleFileExtensions": [

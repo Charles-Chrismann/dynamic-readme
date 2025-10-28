@@ -1,29 +1,16 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body,
+  Controller,
+  Post,
+  Res
+} from '@nestjs/common';
 import { WordleService } from './wordle.service';
-import { Request, Response } from 'express';
-import { ReadmeService } from 'src/readme/readme.service';
-import { Cron } from '@nestjs/schedule';
-import { ConfigService } from 'src/config/config.service';
+import { Response } from 'express';
 
 @Controller('wordle')
 export class WordleController {
   constructor(
-    private configService: ConfigService,
-    private readonly wordleService: WordleService,
-    private readonly readmeService: ReadmeService
+    private readonly wordleService: WordleService
   ) {}
-
-  @Get('wordle')
-  async wordle() {
-    await this.wordleService.wordle();
-    await this.readmeService.commit(':book: set today\'s wordle')
-    return 'wordle';
-  }
-
-  @Cron('0 0 22 * * *')
-  async wordleAndCommit() {
-    await this.wordle();
-  }
 
   @Post('guess')
   async guess(
@@ -31,18 +18,15 @@ export class WordleController {
     @Body('guess') guess: string,
     @Body('GH_ACTION_TRUST') GH_ACTION_TRUST: string,
     @Body('issuer') issuer: string,
-    @Body('issuerId') issuerId: number,
-    @Req() req: Request
+    @Body('issuerId') issuerId: number
   ) {
-    if(GH_ACTION_TRUST !== process.env.GH_ACTION_TRUST) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    if(!guess || guess.length !== 5) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    if(!issuer) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    if(!issuerId) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    console.log('passed')
 
-    await this.wordleService.guess(guess, issuer, issuerId);
-    await this.readmeService.commit(':book: Update wordle')
-    const {config} = this.configService
-    res.redirect(200, config.datas.repo.url + "#a-classic-wordle");
+    return this.wordleService.guess(
+      GH_ACTION_TRUST,
+      guess,
+      issuer,
+      issuerId,
+      res
+    )
   }
 }

@@ -79,6 +79,13 @@ docker cp ./dump.rdb dr-prod-redis:/data/dump.rdb
 docker restart dr-prod-redis
 ```
 
+If docker seems to use an old versin of the code
+
+```sh
+docker compose -f docker-compose.dev.yml --env-file .env.dev down --volumes --remove-orphans
+docker compose -f docker-compose.dev.yml --env-file .env.dev build --no-cache
+```
+
 note: production file not ready
 
 ## To add
@@ -189,3 +196,11 @@ disable game schedule if not runned
 add possibiity to disable games (gameboy service should not save if not displayed) & support for resume
 
 add theme configuration with colors and style buttons
+
+store md in variable to avoid rereender
+
+Add translation keys
+
+needsRender: rerender instantly instead of just setting variable and wait for next render call
+
+Add option to commit on start

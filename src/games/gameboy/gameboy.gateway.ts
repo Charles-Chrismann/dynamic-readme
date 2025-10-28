@@ -1,10 +1,17 @@
-import { SubscribeMessage, WebSocketGateway, OnGatewayConnection, WebSocketServer, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  OnGatewayConnection,
+  WebSocketServer,
+  OnGatewayDisconnect,
+  OnGatewayInit
+} from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { GameboyService } from './gameboy.service';
 import { AuthService } from 'src/auth/auth.service';
 import { CronJob } from 'cron'
 import { RedisService } from 'src/redis/redis.service';
-import { ReadmeService } from 'src/readme/readme.service';
+import { ReadmeService } from 'src/services';
 
 @WebSocketGateway({
   namespace: 'gameboy'
@@ -15,10 +22,17 @@ export class GameboyGateway implements OnGatewayInit, OnGatewayConnection, OnGat
   connected = 0
   clients = new Map<string, number>()
   users = new Map<string, { id: number, inputCount: number, pressed: string[], connectetd: boolean }>()
-  saveJob = new CronJob('0 * * * * *', async () => { await this.saveUsers(this); if (this.needCommit) this.reamdeService.commit(":joystick: Update Gameboy Contributions"); this.needCommit = false})
+  saveJob = new CronJob('0 * * * * *', async () => {
+    await this.saveUsers(this);
+    if (this.needCommit) ReadmeService.renderCommitAndPush(":joystick: Update Gameboy Contributions");
+    this.needCommit = false
+  })
   needCommit = false
   lastSendedFrame!: number[]
-  constructor(private gameboyService: GameboyService, private authService: AuthService, private redis: RedisService, private reamdeService: ReadmeService){
+  constructor(
+    private gameboyService: GameboyService,
+    private authService: AuthService,
+  ){
     this.saveJob.start()
   }
 

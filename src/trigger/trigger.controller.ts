@@ -1,25 +1,34 @@
-import { join } from 'path';
-import { Controller, Get, Res } from '@nestjs/common';
+import * as fs from 'fs/promises'
+import { Controller,
+    Get,
+    Header,
+    OnModuleInit,
+    Res
+} from '@nestjs/common';
 import { Response } from 'express';
-import { ReadmeService } from 'src/readme/readme.service';
-import { RequestService } from 'src/request/request.service';
+import { 
+    ReadmeService,
+    RequestService
+} from 'src/services';
 
 @Controller('trigger')
-export class TriggerController {
-    constructor(
-        private requestService: RequestService,
-        private readMeService: ReadmeService,
-    ) {}
+export class TriggerController implements OnModuleInit {
+    private triggerImageBuffer: Buffer
+    async onModuleInit() {
+        this.triggerImageBuffer = await fs.readFile('./public/trigger.webp')
+    }
 
     @Get()
+    @Header('Content-Type', 'image/webp')
+    @Header('Cache-Control', 'public, max-age=0')
     trigger(@Res() res: Response) {
         // return as soon as possible
-        this.requestService.getFollowers(3).then((followers) => {
-            if(JSON.stringify(followers) !== JSON.stringify(this.requestService.lastFollowers)) {
-                this.requestService.lastFollowers = followers
-                this.readMeService.commit(':alarm_clock: Update followers table')
+        RequestService.getFollowers(3).then((followers) => {
+            if(JSON.stringify(followers) !== JSON.stringify(RequestService.lastFollowers)) {
+                RequestService.lastFollowers = followers
+                ReadmeService.renderCommitAndPush(':alarm_clock: Update followers table')
             }
         })
-        return res.sendFile(join(process.cwd(), 'public/trigger.webp'))
+        return res.send(this.triggerImageBuffer)
     }
 }

@@ -1,44 +1,58 @@
-import { Body, Controller, Get, Param, Post, Query, RawBodyRequest, Req, Res } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import {
+  Controller,
+  Get,
+  Header,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors
+} from '@nestjs/common';
 import { GbaService } from './gba.service';
-import * as rawbody from 'raw-body';
-import { ConfigService } from 'src/config/config.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('gba')
 export class GbaController {
 
   constructor(
-    private configService: ConfigService,
-    private gbaService: GbaService
+    private gbaService: GbaService,
   ){}
 
-  @Get('/input')
-  input(@Query('input') input: string, @Res() res: Response) {
-    const {config} = this.configService
-    res.status(200)
-    res.redirect(config.datas.perso.homepage)
-    if(input) this.gbaService.input(+input)
+  @Get(':id/input')
+  input(
+    @Param('id') id: string,
+    @Query('input') input: string,
+    @Res() res: Response,
+  ) {
+    return this.gbaService.input(id, +input, res)
   }
 
-  @Get('/save')
-  async save(@Res() res: Response) {
-    return await this.gbaService.save(res)
+  @Get(':id/save')
+  async save(
+    @Param() id: string,
+    @Res() res: Response
+  ) {
+    return await this.gbaService.save(id, res)
   }
 
-  @Post('/load')
-  async load(@Req() req: Request) {
-    const save = (await rawbody(req)).toString().trim()
-    this.gbaService.load(save)
+  @Post(':id/load')
+  @UseInterceptors(FileInterceptor('file'))
+  async load(
+    @Param('id') id: string,
+    @UploadedFile() file: any,
+  ) {
+    return await this.gbaService.load(id, file)
   }
 
-  @Get('/doframe')
-  frame(@Res() res: Response) {
-    return this.gbaService.frame(res)
-  }
-
-  @Get('/dogif')
-  gif(@Res() res: Response) {
-    if(!this.gbaService.lastInputFrames.length) return this.gbaService.frame(res)
-    return this.gbaService.gif(res)
+  @Get('/:id/gif')
+  @Header('Cache-Control', 'public, max-age=0')
+  @Header('Content-Type', 'image/gif')
+  gif(
+    @Param('id') id: string
+  ) {
+    return this.gbaService.gif(id)
   }
 }
