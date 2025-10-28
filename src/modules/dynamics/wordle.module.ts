@@ -75,6 +75,7 @@ export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
     if(!guessContainsOnlyLetters) return
     const wordle = JSON.parse(await AppConfigService.redis.client.get('wordle'));
     if(!wordle || wordle.guessed) return
+    this.needsRender = true
     const guessObj = {
       username: issuer,
       userId: issuerId,
