@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "docker compose -f docker-compose.dev.yml --env-file .env.dev up --watch",
+    "dk:app:down": "docker compose -f docker-compose.dev.yml --env-file .env.dev down dynamic-readme",
     "prod": "docker compose -f docker-compose.prod.yml up --build -d",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

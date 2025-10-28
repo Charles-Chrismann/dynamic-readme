@@ -76,6 +76,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
     const chess = new Chess()
     await AppConfigService.redis.client.set(this.redisKey, chess.fen())
     this.renderBoardImage()
+    this.needsRender = true
   }
 
   async move(moveInstruction: MoveInstruction) {
