@@ -6,6 +6,20 @@ It is inspired by [some other dynamic profile READMEs](https://github.com/abhish
 
 This project takes a different approach by creating a new commit on the repository for most of the provided features.
 
+<details>
+  <summary><strong>📚 Table of Contents</strong></summary>
+
+- [Philosophy](#philosophy)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [To Do](#to-do)
+- [Contributing](#contributing)
+- [License](#license)
+
+</details>
+
+
 The workflow in all modules/games follows the same pattern:
 
 1. The user clicks a link in the README and makes a GET request to the app.
@@ -18,10 +32,32 @@ This results in a seemingly simple page refresh for the user.
 
 **Please note**: GitHub's cache system seems to work differently for logged-in users and non-logged-in users; non-logged-in users may not be able to instantly view new changes.
 
-## Setup
+## Philosophy
+
+As you can see on many GitHub users' profiles, the profile is often divided into multiple sections such as “About Me,” “My Projects,” “My Tools,” “Contact Me,” etc.
+
+This project follows the same philosophy by dividing the file into what are called **modules**, which handle the logic and rendering of each section of the final file.
+
+A module can extend either the **AbstractStaticModule**, which means it is not likely to change — for example, an “About Me” section.
+
+A module can also extend the **AbstractDynamicModule**, which means it will change over time — for example, a chess game or a “Latest Followers” section.
+
+## Project Structure
+
+The core files and folders of the app are as follows:
+
+- **`src/modules`** — contains both static and dynamic modules. Each module encapsulates the logic for its section of the file and is also responsible for rendering that specific section.  
+- **`src/State.js`** — the `State` class manages all modules and the final rendering of the file.  
+- **`src/services/ConfigService.ts`** — a utility class used to access environment variables and the configuration object.  
+- **`src/services/ReadmeService.ts`** — a utility class used to interact with GitHub. Most of the time, you’ll want to call `ReadmeService.updateReadmeAndRedirect()`. (Use `ReadmeService.doNothingAndRedirect()` if there are no changes to apply.)  
+- **`src/services/RequestService.ts`** — a utility class used to interact with the GitHub REST and GraphQL APIs.
+
+
+## 🛠️ Setup
 
 Requirements:
   - Docker
+  - Node & NPM
 
 Steps:
 1. git clone https://github.com/Charles-Chrismann/dynamic-readme
@@ -29,7 +65,7 @@ Steps:
 4. dupe config.example.json and rename it config.json, fill variables
 5. dl roms and put them in the `roms` folder
 
-## Developpement
+### 👨‍💻 Developpement
 
 ```sh
 npm run dev
@@ -39,7 +75,7 @@ equivalent to: `docker compose -f docker-compose.dev.yml up --watch`
 
 > you might need to trigger the hot reload to get the latest version of the app.
 
-## Production
+### 🚀 Production
 
 ```sh
 npm run prod
@@ -47,7 +83,8 @@ npm run prod
 
 equivalent to: `docker compose -f docker-compose.prod.yml up --build -d`
 
-## Utility commands
+<details>
+  <summary>📂 Utility commands</summary>
 
 delet all volumes
 
@@ -86,9 +123,37 @@ docker compose -f docker-compose.dev.yml --env-file .env.dev down --volumes --re
 docker compose -f docker-compose.dev.yml --env-file .env.dev build --no-cache
 ```
 
-note: production file not ready
+</details>
 
-## To add
+## Contributing
+
+Contributions are welcome!  
+If you want to improve the project, fix a bug, or add a new feature, feel free to open a pull request or submit an issue.
+
+Before contributing, please make sure your code is clean, consistent, and well-documented.  
+Try to follow the existing project structure and naming conventions to keep everything coherent.
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
+
+This means that:
+- You are free to **use, modify, and distribute** the software.
+- If you distribute a modified version, you **must make your source code available** under the same license (GPL-3.0).
+- You **cannot** make the software proprietary or distribute it under a different license.
+- Any derivative work must remain **open source** and **credit the original author**.
+
+👉 In short: you can do almost anything with the code, as long as you **keep it open source** and **share your modifications** under the same terms.
+
+For more details, see the full license text in the [LICENSE](./LICENSE) file.
+
+
+## To Do
+
+This section is not mean to be user friendly, just taking notes
+
+<details>
+  <summary>📝 To do</summary>
 
 screenshot of the game
 
@@ -204,3 +269,8 @@ Add translation keys
 needsRender: rerender instantly instead of just setting variable and wait for next render call
 
 Add option to commit on start
+
+add live way to disable module
+
+</details>
+
