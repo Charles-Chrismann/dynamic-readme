@@ -9,16 +9,34 @@ This project takes a different approach by creating a new commit on the reposito
 <details>
   <summary><strong>📚 Table of Contents</strong></summary>
 
-- [Philosophy](#philosophy)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [To Do](#to-do)
-- [Contributing](#contributing)
-- [License](#license)
+- 💭 [Philosophy](#-philosophy)
+- 🏗️ [Project Structure](#%EF%B8%8F-project-structure)
+- 🛠️ [Installation](#%EF%B8%8F-installation)
+- 📝 [To Do](#-to-do)
+- ✨ [Contributing](#-contributing)
+- ⚖️ [License](#%EF%B8%8F-license)
 
 </details>
 
+## 💭 Philosophy
+
+As you can see on many GitHub users' profiles, the profile is often divided into multiple sections such as "About Me", "My Projects", "My Tools", "Contact Me" etc.
+
+This project follows the same philosophy by dividing the file into what are called **modules**, which handle the logic and rendering of each section of the final file.
+
+## 🏗️ Project Structure
+
+The core files and folders of the app are as follows:
+
+- **`src/modules`**: contains both static and dynamic modules. Each module encapsulates the logic for its section of the file and is also responsible for rendering that specific section.  
+- **`src/State.js`**: the `State` class manages all modules and the final rendering of the file.  
+- **`src/services/ConfigService.ts`**: a utility class used to access environment variables and the configuration object.  
+- **`src/services/ReadmeService.ts`**: a utility class used to interact with GitHub. Most of the time, you’ll want to call `ReadmeService.updateReadmeAndRedirect()`. (Use `ReadmeService.doNothingAndRedirect()` if there are no changes to apply.)  
+- **`src/services/RequestService.ts`**: a utility class used to interact with the GitHub REST and GraphQL APIs.
+
+A module can extend either the **AbstractStaticModule**, which means it is not likely to change — for example, an “About Me” section.
+
+A module can also extend the **AbstractDynamicModule**, which means it will change over time — for example, a chess game or a “Latest Followers” section.
 
 The workflow in all modules/games follows the same pattern:
 
@@ -30,30 +48,10 @@ The workflow in all modules/games follows the same pattern:
 
 This results in a seemingly simple page refresh for the user.
 
-**Please note**: GitHub's cache system seems to work differently for logged-in users and non-logged-in users; non-logged-in users may not be able to instantly view new changes.
+> [!NOTE]
+> GitHub's cache system seems to work differently for logged-in users and non-logged-in users; non-logged-in users may not be able to instantly view new changes.
 
-## Philosophy
-
-As you can see on many GitHub users' profiles, the profile is often divided into multiple sections such as “About Me,” “My Projects,” “My Tools,” “Contact Me,” etc.
-
-This project follows the same philosophy by dividing the file into what are called **modules**, which handle the logic and rendering of each section of the final file.
-
-A module can extend either the **AbstractStaticModule**, which means it is not likely to change — for example, an “About Me” section.
-
-A module can also extend the **AbstractDynamicModule**, which means it will change over time — for example, a chess game or a “Latest Followers” section.
-
-## Project Structure
-
-The core files and folders of the app are as follows:
-
-- **`src/modules`** — contains both static and dynamic modules. Each module encapsulates the logic for its section of the file and is also responsible for rendering that specific section.  
-- **`src/State.js`** — the `State` class manages all modules and the final rendering of the file.  
-- **`src/services/ConfigService.ts`** — a utility class used to access environment variables and the configuration object.  
-- **`src/services/ReadmeService.ts`** — a utility class used to interact with GitHub. Most of the time, you’ll want to call `ReadmeService.updateReadmeAndRedirect()`. (Use `ReadmeService.doNothingAndRedirect()` if there are no changes to apply.)  
-- **`src/services/RequestService.ts`** — a utility class used to interact with the GitHub REST and GraphQL APIs.
-
-
-## 🛠️ Setup
+## 🛠️ Installation
 
 Requirements:
   - Docker
@@ -61,11 +59,14 @@ Requirements:
 
 Steps:
 1. git clone https://github.com/Charles-Chrismann/dynamic-readme
-4. dupe .env.example and rename it .env, fill variables
-4. dupe config.example.json and rename it config.json, fill variables
-5. dl roms and put them in the `roms` folder
+2. dupe .env.example and rename it .env, fill variables
+3. dupe config.example.json and rename it config.json, fill variables
 
-### 👨‍💻 Developpement
+> [!NOTE]
+> Some modules like the Gba module might required additional setup
+
+<details>
+  <summary>👨‍💻 Developpement</summary>
 
 ```sh
 npm run dev
@@ -75,13 +76,18 @@ equivalent to: `docker compose -f docker-compose.dev.yml up --watch`
 
 > you might need to trigger the hot reload to get the latest version of the app.
 
-### 🚀 Production
+</details>
+
+<details>
+  <summary>🚀 Production</summary>
 
 ```sh
 npm run prod
 ```
 
 equivalent to: `docker compose -f docker-compose.prod.yml up --build -d`
+
+</details>
 
 <details>
   <summary>📂 Utility commands</summary>
@@ -125,7 +131,7 @@ docker compose -f docker-compose.dev.yml --env-file .env.dev build --no-cache
 
 </details>
 
-## Contributing
+## ✨ Contributing
 
 Contributions are welcome!  
 If you want to improve the project, fix a bug, or add a new feature, feel free to open a pull request or submit an issue.
@@ -133,7 +139,7 @@ If you want to improve the project, fix a bug, or add a new feature, feel free t
 Before contributing, please make sure your code is clean, consistent, and well-documented.  
 Try to follow the existing project structure and naming conventions to keep everything coherent.
 
-## License
+## ⚖️ License
 
 This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**.
 
@@ -148,7 +154,7 @@ This means that:
 For more details, see the full license text in the [LICENSE](./LICENSE) file.
 
 
-## To Do
+## 📝 To Do
 
 This section is not mean to be user friendly, just taking notes
 
