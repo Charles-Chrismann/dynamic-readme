@@ -185,7 +185,7 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${this.getImageUrl("top.png")}">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${this.getImageUrl("top-left.png")}">\n  </a>\n`
-    str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${BASE_URL_GBA_WITH_ID}/gif" width="240" height="160">\n  </a>\n`
+    str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${BASE_URL_GBA_WITH_ID}/gif">\n  </a>\n`
     str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${this.getImageUrl("top-right.png")}">\n  </a>\n`
     str += `  <br>\n`
     str += `  <a href="${BASE_URL_GBA_WITH_ID}/input">\n    <img src="${this.getImageUrl("top-bottom.png")}">\n  </a>\n`
