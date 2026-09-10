@@ -5,7 +5,7 @@ import { AppConfigService } from "src/services"
 export abstract class AbstractModule<Data = Record<string, any>, Options = Record<string, any>> {
   public data: Data
   protected options: Options
-  protected md: string
+  protected md!: string
   constructor(data: Data, options: Options = {} as Options) {
     this.data = data
     this.options = options
@@ -36,9 +36,7 @@ export abstract class AbstractDynamicModule<Data = Record<string, any>, Options 
     this.logger = new Logger(`${this.constructor.name}`)
   }
 
-  public init(): Promise<void> {
-    return
-  }
+  init?(): Promise<void>;
   
   public async toMd() {
     if(this.ALWAYS_RERENDER) {

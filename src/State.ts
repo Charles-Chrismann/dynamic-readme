@@ -1,5 +1,4 @@
-import * as fs from 'fs/promises'
-import { ConfigSchema } from './zod.zodobject';
+import { Config, ConfigSchema } from './zod.zodobject';
 import {
   AbstractModule,
   ElementStaticModule,
@@ -15,20 +14,43 @@ import {
   GeneratedDynamicModule,
   TriggerStaticModule,
   WordleDynamicModule,
+  AbstractDynamicModule,
 } from './modules';
 import { MinesweeperDynamicModule } from './modules/dynamics/minesweeper.module';
 import { ChessDynamicModule } from './modules/dynamics/chess.module';
-import { AppConfigService } from './services';
+import { RequestService } from './services';
 
 type ModuleConstructor<TData = any, TOptions = any> = new (data: TData, options?: TOptions) => AbstractModule<TData, TOptions>;
 
+type Paths<T> = T extends object
+  ? {
+      [K in keyof T & string]:
+        NonNullable<T[K]> extends object
+          ? K | `${K}.${Paths<NonNullable<T[K]>>}`
+          : K
+    }[keyof T & string]
+  : never;
+
+  type PathValue<T, P extends string> =
+  P extends `${infer K}.${infer Rest}`
+    ? K extends keyof NonNullable<T>
+      ? PathValue<NonNullable<T>[K], Rest>
+      : never
+    : P extends keyof NonNullable<T>
+      ? NonNullable<T>[P]
+      : never;
+
 class State {
   public modules: AbstractModule[] = []
-  public startRenderDTimestamp: number
+  public startRenderTimestamp!: number
+  private config: Config | null = null
 
-  async init(conf?: Record<string, any>) {
-    const unsafe_config = conf ?? JSON.parse((await fs.readFile('./config.json')).toString())
+  async init(unsafe_config: Record<string, any>) {
+  
     const config = ConfigSchema.parse(unsafe_config)
+    this.config = config
+
+    if(this.config.datas.user) await RequestService.init()
 
     const modules = new Map<string, ModuleConstructor>([
       ["static/element", ElementStaticModule],
@@ -48,8 +70,9 @@ class State {
       ["dynamic/chess", ChessDynamicModule],
     ])
 
-    const moduleInitPromises = []
+    this.modules = []
 
+    const moduleInitPromises: Promise<any>[] = []
     for(const element of config.structure) {
       if("disabled" in element && element.disabled) continue
 
@@ -64,7 +87,12 @@ class State {
       const options = "options" in element ? element.options : {};
       const createdModule = new module(data, options)
 
-      if("init" in createdModule) moduleInitPromises.push((createdModule.init as Function)())
+      if (
+        createdModule instanceof AbstractDynamicModule
+        && createdModule.init
+      ) {
+        moduleInitPromises.push(createdModule.init());
+      }
       
       this.modules.push(createdModule)
     }
@@ -72,7 +100,10 @@ class State {
   }
 
   async render() {
-    this.startRenderDTimestamp = Date.now()
+
+    if(!this.config) throw new Error('Config not set')
+
+    this.startRenderTimestamp = Date.now()
     const renderPromises: (string | Promise<string>)[] = []
     
     for(const module of this.modules) {
@@ -82,6 +113,35 @@ class State {
     const moduleStr = await Promise.all(renderPromises)
 
     return moduleStr.join('')
+  }
+
+  getConfig(): Config;
+  getConfig<P extends Paths<Config>>(
+    path: P
+  ): NonNullable<PathValue<Config, P>>;
+  getConfig<P extends Paths<Config>>(
+    path?: P
+  ): Config | NonNullable<PathValue<Config, P>> {
+    if (!this.config) {
+      throw new Error("Config not set");
+    }
+
+    if (path === undefined) {
+      return this.config;
+    }
+
+    const value = path
+      .split(".")
+      .reduce(
+        (acc: any, key) => acc?.[key],
+        this.config
+      ) as PathValue<Config, P>;
+
+    if (value == null) {
+      throw new Error(`Config key ${path} not set`);
+    }
+
+    return value as NonNullable<PathValue<Config, P>>;
   }
 }
 

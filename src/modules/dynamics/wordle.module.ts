@@ -3,6 +3,8 @@ import { FIVE_CHAR_WORDS } from "src/games/wordle/word_list";
 import { CronJob } from "cron";
 import ReadmeService from "src/services/ReadmeService";
 import { AppConfigService } from "src/services";
+import { readFile, writeFile } from "fs/promises";
+import { Wordle, wordleSchema } from "src/zod.zodobject";
 
 interface Data {
 }
@@ -11,27 +13,9 @@ interface Options {
 }
 
 export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
-
-  todayWordle: {
-    word: string,
-    guessed: boolean,
-    guesses: {
-      username: string,
-      userId: number,
-      guess: {
-        valid: boolean,
-        letters: { value: string, status: "correct" | "present" | "absent" }[]
-      }
-    }[]
-  };
-
-  scoreBoard: {
-    users: {
-      username: string,
-      userId: number,
-      guesses: number
-    }[]
-  }
+  initialized = false
+  todayWordle!: Wordle['todayWordle'];
+  scoreBoard!: Wordle['scoreboard'];
 
   createWordleCron = new CronJob('0 0 22 * * *', async () => {
     await this.wordle()
@@ -40,88 +24,102 @@ export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
   }, null, true)
 
   public async init(): Promise<void> {
-    if(!await AppConfigService.redis.client.get('wordle')) await this.wordle()
-    if(!await AppConfigService.redis.client.get('wordle-scoreBoard')) {
-      await AppConfigService.redis.client.set(
-        'wordle-scoreBoard',
-        JSON.stringify({
-          users: [] as {
-            username: string,
-            userId: number,
-            guesses: number
-            }[]
-          }
-        )
-      )
+    let wordleData: Wordle
+    try {
+      const wordleStringData = (await readFile('./config/datas/wordle.json')).toString('utf-8')
+      wordleData = wordleSchema.parse(JSON.stringify(wordleStringData))
+    } catch (err: unknown) {
+      wordleData = {
+        scoreboard: [],
+        todayWordle: this.getNewWordle()
+      }
+      await this.save()
     }
+    const { scoreboard, todayWordle } = wordleData
+    this.scoreBoard = scoreboard
+    this.todayWordle = todayWordle
+    this.initialized = true
   }
 
-  async wordle() {
+  async save() {
+    const { todayWordle, scoreBoard } = this
+    await writeFile('./config/datas/wordle.json', JSON.stringify({
+      todayWordle,
+      scoreBoard,
+    }))
+  }
+
+  getNewWordle() {
     const word = FIVE_CHAR_WORDS[Math.floor(Math.random() * FIVE_CHAR_WORDS.length)]
     const wordle = {
       word,
       guessed: false,
-      guesses: []
+      guesses: [] as Wordle['todayWordle']['guesses']
     }
-    await AppConfigService.redis.client.set('wordle', JSON.stringify(wordle))
+    return wordle
+  }
+
+  async wordle() {
+    this.todayWordle = this.getNewWordle()
+    await this.save()
 
     return 'wordle';
   }
 
   async guess(guess: string, issuer: string, issuerId: number) {
+
+    if(!this.initialized) throw new Error('Wordle module not initialized')
+
     guess = guess.toUpperCase();
     if(!guess.length || guess.length > 5) return
+
     const guessContainsOnlyLetters = /^[A-Z]+$/.test(guess);
     if(!guessContainsOnlyLetters) return
-    const wordle = JSON.parse(await AppConfigService.redis.client.get('wordle'));
-    if(!wordle || wordle.guessed) return
+
+    if(this.todayWordle.guessed) return
+
     this.needsRender = true
     const guessObj = {
       username: issuer,
       userId: issuerId,
       guess: {
         valid: FIVE_CHAR_WORDS.includes(guess),
-        letters: [] as { value: string, status: "correct" | "present" | "absent" }[]
+        letters: [] as Wordle['todayWordle']['guesses'][number]['guess']['letters']
       }
     }
     for(let i = 0; i < 5; i++) {
       const value = guess[i];
-      if(value === wordle.word[i]) {
+      if(value === this.todayWordle.word[i]) {
         guessObj.guess.letters.push({ value, status: "correct" })
-      } else if(wordle.word.includes(value)) {
+      } else if(this.todayWordle.word.includes(value)) {
         guessObj.guess.letters.push({ value, status: "present" })
       } else {
         guessObj.guess.letters.push({ value, status: "absent" })
       }
     }
   
-    wordle.guessed = guess === wordle.word;
-    wordle.guesses.push(guessObj);
-    await AppConfigService.redis.client.set('wordle', JSON.stringify(wordle))
-    this.todayWordle = wordle;
+    this.todayWordle.guessed = guess === this.todayWordle.word;
+    this.todayWordle.guesses.push(guessObj);
   
-    let scoreBoard = JSON.parse(await AppConfigService.redis.client.get('wordle-scoreBoard'))
-    if(wordle.guessed) {
-      if(!scoreBoard) scoreBoard = { users: [] };
-      const userIndex = scoreBoard.users.findIndex(user => user.username === issuer);
+    if(this.todayWordle.guessed) {
+      const userIndex = this.scoreBoard.findIndex(user => user.username === issuer);
       if(userIndex === -1) {
-        scoreBoard.users.push({ username: issuer, userId: issuerId, guesses: 1});
+        this.scoreBoard.push({ username: issuer, userId: issuerId, guesses: 1});
       } else {
-        scoreBoard.users[userIndex].guesses += 1;
+        this.scoreBoard[userIndex].guesses += 1;
       }
-      scoreBoard.users.sort((a, b) => b.guesses - a.guesses);
-      await AppConfigService.redis.client.set('wordle-scoreBoard', JSON.stringify(scoreBoard))
+      this.scoreBoard.sort((a, b) => b.guesses - a.guesses);
+      await this.save()
     }
   }
 
   public async render(): Promise<string> {
     const config = AppConfigService.getOrThrow('config')
-    const todayWordle = JSON.parse(await AppConfigService.redis.client.get('wordle'))
-    const scoreBoard = JSON.parse(await AppConfigService.redis.client.get('wordle-scoreBoard'))
+    const { todayWordle, scoreBoard } = this
     let md = `<h3 align="center">A classic Wordle</h3>\n`
     md += `<table align="center">\n  <thead>\n    <tr>\n      <th colspan="5">Wordle</th><th>Player</th>\n    </tr>\n  </thead>\n  <tbody>\n`
     md += todayWordle.guesses.map(guess => {
-      let letterTds
+      let letterTds: string
       if(!guess.guess.valid) letterTds = guess.guess.letters.map(letter => `      <td>$\\text{\\color{red}{${letter.value}}}$</td>\n`).join('')
       else letterTds = guess.guess.letters.map(letter => `      <td>${letter.status === 'correct' ? `$\\text{\\color{lightgreen}{${letter.value}}}$` : (letter.status === 'present' ? `$\\text{\\color{orange}{${letter.value}}}$` : `$\\text{\\color{white}{${letter.value}}}$`)}</td>\n`).join('')
       return `    <tr>\n${letterTds}      <td>\n        <a href="https://github.com/${guess.username}">@${guess.username}</a>\n      </td>\n    </tr>\n`
@@ -131,7 +129,7 @@ export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
     md += `  </tbody>\n</table>\n`
 
     md += `<table align="center">\n  <thead>\n    <tr>\n      <th colspan="4">Scoreboard</th>\n    </tr>\n    <tr>\n      <th>Rank</th>\n      <th colspan="2">Player</th>\n      <th>Wins</th>\n    </tr>\n  </thead>\n  <tbody>\n`
-    md += scoreBoard.users.map((user, index) => `    <tr>\n      <td align="center">${index + 1}</td>\n      <td align="center">\n        <a href="https://github.com/${user.username}">\n          <img src="https://avatars.githubusercontent.com/u/${user.userId}?size=32" width="40" height="40"/>\n        </a>\n      </td>\n      <td>\n        <a href="https://github.com/${user.username}">@${user.username}</a>\n      </td>\n      <td align="center">${user.guesses}</td>\n    </tr>\n`).join('')
+    md += scoreBoard.map((user, index) => `    <tr>\n      <td align="center">${index + 1}</td>\n      <td align="center">\n        <a href="https://github.com/${user.username}">\n          <img src="https://avatars.githubusercontent.com/u/${user.userId}?size=32" width="40" height="40"/>\n        </a>\n      </td>\n      <td>\n        <a href="https://github.com/${user.username}">@${user.username}</a>\n      </td>\n      <td align="center">${user.guesses}</td>\n    </tr>\n`).join('')
     md += `  </tbody>\n</table>\n\n`
 
     md += `<hr>\n\n`

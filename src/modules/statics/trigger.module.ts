@@ -1,6 +1,7 @@
 import { AppConfigService } from "src/services";
 import { AbstractStaticModule } from "../abstract.module";
 import { AppConfig } from "src/declaration";
+import State from "src/State";
 
 interface Data {
 }
@@ -10,7 +11,7 @@ interface Options {
 
 export class TriggerStaticModule extends AbstractStaticModule<Data, Options> {
   public render(): string | Promise<string> {
-    const owner = AppConfigService.getOrThrow<AppConfig['datas']['repo']['owner']>('config.datas.repo.owner');
+    const owner = State.getConfig('datas.repo.owner');
     const env = AppConfigService.getOrThrow<string>('NODE_ENV');
     const BASE_URL = env === 'production'
     ? AppConfigService.APP_BASE_URL

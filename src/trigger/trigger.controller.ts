@@ -13,7 +13,7 @@ import {
 
 @Controller('trigger')
 export class TriggerController implements OnModuleInit {
-    private triggerImageBuffer: Buffer
+    private triggerImageBuffer!: Buffer
     async onModuleInit() {
         this.triggerImageBuffer = await fs.readFile('./public/trigger.webp')
     }

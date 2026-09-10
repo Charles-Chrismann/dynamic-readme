@@ -1,9 +1,6 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { Wrapper } from "gbats";
 import { AbstractDynamicModule } from "../abstract.module";
 import { createCanvas } from "@napi-rs/canvas";
-import { RedisService } from "src/redis/redis.service";
 import { CronJob } from 'cron';
 import { Logger } from '@nestjs/common';
 import { buffer } from 'stream/consumers';
@@ -11,6 +8,7 @@ import { GifEncoder } from '@skyra/gifenc';
 import { Readable } from 'stream';
 import { AppConfigService } from 'src/services';
 import { Response } from 'express';
+import { readFile, writeFile } from 'fs/promises';
 
 interface Data {
   uuid: string
@@ -20,31 +18,27 @@ interface Options {
 }
 
 export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
-
-  gba_wrapper: Wrapper
-  canvas = createCanvas(240, 160)
-  redis: RedisService
-  cron: CronJob
   protected readonly logger = new Logger("GBA")
-  gifBuffer: Buffer
-  redisKey: string
+
+  gba_wrapper!: Wrapper
+  canvas = createCanvas(240, 160)
+  cron!: CronJob
+  gifBuffer!: Buffer
 
   constructor(data: Data, options?: Options) {
     super(data, options)
-    this.redis = AppConfigService.redis
-    this.redisKey = `gba:save_state:${this.data.uuid}`
   }
 
   public async init(): Promise<void> {
 
-    const rom = fs.readFileSync(path.join(process.env.PWD, 'roms', process.env.ROM_GBA_NAME))
+    const rom = await readFile(`./config/roms/${process.env.ROM_GBA_NAME}`)
 
     this.gba_wrapper = new Wrapper({
       rom,
       canvas: this.canvas,
       updateMethod: 'manual'
     })
-    const gi = await this.redis.client.get(this.redisKey)
+    const gi = await readFile(`./config/datas/gba.txt`)
     if(gi) {
       await this.gba_wrapper.loadSaveState(gi)
     }
@@ -52,13 +46,13 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     const frames = this.skipFrames(600, true)
     this.gifBuffer = await this.createGifBuffer(frames)
     
-    this.cron = new CronJob(process.env.EMU_BACKUP_CRON, () => this.backup(), null, true)
+    this.cron = new CronJob(process.env.EMU_BACKUP_CRON!, () => this.backup(), null, true)
   }
 
   async backup() {
     this.logger.log('[SHEDULED] Saving gba')
     const save = await this.gba_wrapper.createSaveState()
-    this.redis.client.set(this.redisKey, save)
+    await writeFile(`./config/datas/gba.txt`, save)
   }
 
   public render(): string | Promise<string> {
@@ -80,6 +74,9 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     this.gifBuffer = await this.createGifBuffer(frames)
   }
 
+  skipFrames(n: number): undefined;
+  skipFrames(n: number, returnFrames: false): undefined
+  skipFrames(n: number, returnFrames: true): number[][]
   skipFrames(
     n: number,
     returnFrames: boolean = false
@@ -162,7 +159,7 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     this.gifBuffer = await this.createGifBuffer(frames)
 
     const save = await this.gba_wrapper.createSaveState()
-    await this.redis.client.set(this.redisKey, save)
+    await writeFile(`./config/datas/gba.txt`, save)
   }
 
   getImageUrl(url_fragment: string) {

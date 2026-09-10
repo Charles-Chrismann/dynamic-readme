@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises'
 import { join } from 'path';
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
@@ -8,7 +8,6 @@ import { AppService } from './app.service';
 import { GamesModule } from './games/games.module';
 import { TriggerModule } from './trigger/trigger.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import State from './State';
@@ -20,13 +19,27 @@ import { AppConfigService, RequestService } from './services';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      load: [
-        async () => {
-          const unsafe_config = JSON.parse((await fs.readFile('./config.json')).toString())
-          const config = ConfigSchema.parse(unsafe_config)
-          return { config }
-        }
-      ]
+      // load: [
+      //   async () => {
+      //     console.log(1)
+      //     const [customConfig, defaultConfig] = await Promise.allSettled([
+      //       fs.readFile('./config/datas/config.json', 'utf-8'),
+      //       fs.readFile('./config/datas/config.default.json', 'utf-8'),
+      //     ])
+
+      //     let conf = customConfig.status === 'fulfilled' ? customConfig.value
+      //       : defaultConfig.status === 'fulfilled' ? defaultConfig.value : null
+
+      //     if(!conf) throw new Error(`No custom configuration provided, no default configuration available`)
+          
+          
+      //     const unsafe_config = JSON.parse(conf)
+      //     console.log(2)
+      //     const config = ConfigSchema.parse(unsafe_config)
+      //     console.log(config)
+      //     return { config }
+      //   }
+      // ]
     }),
     ScheduleModule.forRoot(),
     GamesModule,
@@ -34,8 +47,7 @@ import { AppConfigService, RequestService } from './services';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    RedisModule,
-    AuthModule,
+    // AuthModule,
     UsersModule,
   ],
   controllers: [AppController],
@@ -45,10 +57,23 @@ import { AppConfigService, RequestService } from './services';
   ],
 })
 export class AppModule implements OnModuleInit {
+
+  private readonly logger = new Logger(AppModule.name);
+
   async onModuleInit() {
-    await Promise.all([
-      RequestService.init(),
-      State.init(),
+    const [customConfig, defaultConfig] = await Promise.allSettled([
+      fs.readFile('./config/datas/config.json', 'utf-8'),
+      fs.readFile('./config/datas/config.default.json', 'utf-8'),
     ])
+    let conf = customConfig.status === 'fulfilled' ? customConfig.value
+      : defaultConfig.status === 'fulfilled' ? defaultConfig.value : null
+      
+    if(!conf) {
+      this.logger.log('App starting with no configuration, Sate.render method will fail if no configuration set.')
+      return
+    }
+    const config = JSON.parse(conf)
+    console.log(config)
+    State.init(config)
   }
 }

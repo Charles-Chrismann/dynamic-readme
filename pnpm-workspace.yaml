@@ -1,0 +1,4 @@
+allowBuilds:
+  '@nestjs/core': true
+onlyBuiltDependencies:
+  - "@nestjs/core"

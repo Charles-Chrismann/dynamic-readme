@@ -1,10 +1,13 @@
 import { commandOptions } from "redis";
 import { GifEncoder } from "@skyra/gifenc";
-import { createCanvas, loadImage } from "@napi-rs/canvas";
+import { createCanvas, Image, loadImage } from "@napi-rs/canvas";
 import { AbstractDynamicModule } from "../abstract.module";
 import { Minesweeper } from "src/games/minesweeper/classes/Minesweeper";
 import { AppConfigService } from "src/services";
 import { buffer } from "stream/consumers";
+import { readFile, writeFile } from "fs/promises";
+import { minesweeperSchema } from "src/zod.zodobject";
+import type { Minesweeper as MinesweeperType } from '../../zod.zodobject'
 
 interface Data {
   uuid: string
@@ -15,29 +18,61 @@ interface Options {
 
 export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Options> {
 
-  redisKey: string
-  redisImagesKey: string
-  gifBuffer: Buffer
+  minesweeper!: Minesweeper
+  frames: Uint8ClampedArray<ArrayBufferLike>[] = []
+  gifBuffer: Buffer | null = null
 
   async init() {
-    this.redisKey = `msw:${this.data['uuid']}`
-    this.redisImagesKey = `msw:${this.data['uuid']}:images`
-    if(!await AppConfigService.redis.client.get(this.redisKey)) await this.new()
-    else {
-      await this.generatehistoryGif()
+    try {
+      const minsweeperSaveStr = (await readFile(`./config/datas/minesweeper/${this.data['uuid']}.json`)).toString('utf-8')
+      const { map, history } = minesweeperSchema.parse(JSON.parse(minsweeperSaveStr))
+      
+      const minesweeper = new Minesweeper()
+      minesweeper.init({
+        width: map[0].length,
+        height: map.length,
+        bombsCount: map.flat().filter(c => c.value === 9).length
+      })
+
+      for(const [x, y] of history) {
+        minesweeper.handleClick({ x, y })
+        const frame = await this.renderGameImageCtx(minesweeper)
+        this.frames.push(frame)
+      }
+
+      this.generatehistoryGif()
+
+    } catch (err: unknown) {
+      this.new()
+      await this.save()
     }
   }
 
+  async save() {
+    const { history, map } = this.minesweeper
+    const data: MinesweeperType = {
+      id: this.data['uuid'],
+      history,
+      map,
+    }
+    await writeFile(`./config/datas/minesweeper/${this.data['uuid']}.json`, JSON.stringify(data))
+  }
+
   async new() {
-    const minesweeper = new Minesweeper(18, 14, 24)
-    await Promise.all([
-      AppConfigService.redis.client.set(this.redisKey, JSON.stringify(minesweeper)),
-      AppConfigService.redis.client.unlink(this.redisImagesKey)
-    ])
-    await this.renderGameImageCtx(true, minesweeper)
+    this.minesweeper = new Minesweeper().init({ width: 18, height: 14, bombsCount: 24 })
+
+    const tileSize = 16;
+    const width = tileSize * this.minesweeper.width;
+    const height = tileSize * this.minesweeper.height;
+    const canvas = createCanvas(tileSize * width, tileSize * height)
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = "#000000"
+    ctx.fillRect(0, 0, tileSize * width, tileSize * height)
+    this.frames.push(ctx.getImageData(0, 0, width, height).data)
+
     this.gifBuffer = null
     this.needsRender = true
-    return minesweeper
+    return this.minesweeper
   }
 
   /**
@@ -46,34 +81,30 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
    * @returns true if the map has been updated false otherwise
    */
   async click(x: number, y: number): Promise<boolean> {
-    const minesweeperData: Record<string, any> = JSON.parse(await AppConfigService.redis.client.get(this.redisKey))
-    const minesweeper = minesweeperData ? new Minesweeper(minesweeperData) : await this.new()
-    if(minesweeper.gameStatus === "Ended") return false
-    if(!minesweeper.HandleClick({x: x, y: y})) return false
-    if(minesweeper.map.flat().filter(cell => cell.hidden).length === minesweeper.bombsCount) minesweeper.gameStatus = "Endend"
-    await this.renderGameImageCtx(false, minesweeper)
-    await AppConfigService.redis.client.set(this.redisKey, JSON.stringify(minesweeper))
+    if(this.minesweeper.gameStatus === "Ended") return false
+    if(!this.minesweeper.handleClick({x: x, y: y})) return false
+    this.minesweeper.history.push([x, y])
+    if(this.minesweeper.map.flat().filter(cell => cell.hidden).length === this.minesweeper.bombsCount) this.minesweeper.gameStatus = "Ended"
+    await this.renderGameImageCtx(this.minesweeper)
+    await this.save()
     this.needsRender = true
     this.generatehistoryGif()
     return true
   }
 
-  async renderGameImageCtx(isFirst: boolean = false, minesweeperData: Record<string, any>) {
+  async renderGameImageCtx(minesweeperData: Minesweeper) {
     const tileSize = 16;
-    const canvas = createCanvas(tileSize * minesweeperData.width, tileSize * minesweeperData.height)
+    const width = tileSize * minesweeperData.width;
+    const height = tileSize * minesweeperData.height;
+    const canvas = createCanvas(tileSize * width, tileSize * height)
     const ctx = canvas.getContext('2d')
     ctx.fillStyle = "#000000"
-    ctx.fillRect(0, 0, tileSize * minesweeperData.width, tileSize * minesweeperData.height)
+    ctx.fillRect(0, 0, tileSize * width, tileSize * height)
 
-    if(isFirst) {
-      AppConfigService.redis.client.hSet(this.redisImagesKey, 0, ctx.canvas.toBuffer('image/png'))
-      return
-    }
-
-    const emojis = {}
+    const emojis: Record<string, Image> = {}
     const emojiList = ["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"]
-    for(let i = 0; i < minesweeperData.width; i++) {
-      for(let j = 0; j < minesweeperData.height; j++) {
+    for(let i = 0; i < width; i++) {
+      for(let j = 0; j < height; j++) {
         const cell = minesweeperData.map[j][i]
         if(cell.hidden) continue
         if(!cell.value) {
@@ -89,31 +120,23 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
         ctx.drawImage(emojiImage, cell.x * tileSize, cell.y * tileSize, tileSize, tileSize)
       }
     }
-    const savedImages = await AppConfigService.redis.client.hGetAll(this.redisImagesKey)
-    AppConfigService.redis.client.hSet(this.redisImagesKey, Object.keys(savedImages).length, ctx.canvas.toBuffer('image/png'))
+    return ctx.getImageData(0, 0, width, height).data;
   }
 
   async generatehistoryGif() {
-    const minesweeperData: Record<string, any> = JSON.parse(await AppConfigService.redis.client.get(this.redisKey))
-    const imagesPromises = Object.values(await AppConfigService.redis.client.hGetAll(commandOptions({ returnBuffers: true }), this.redisImagesKey)).map(async buffer => await loadImage(buffer))
-    const images = await Promise.all(imagesPromises)
-
     const tileSize = 16;
-    const canvasWidth = minesweeperData.width * tileSize
-    const canvasHeight = minesweeperData.height * tileSize
+    const canvasWidth = this.minesweeper.width * tileSize
+    const canvasHeight = this.minesweeper.height * tileSize
     const gifEncoder = new GifEncoder(canvasWidth, canvasHeight)
-    .setRepeat(0)
-    .setDelay(Math.floor(5000 / images.length || 1))
-    .setQuality(10)
+      .setRepeat(0)
+      .setDelay(Math.floor(5000 / this.frames.length || 1))
+      .setQuality(10)
     const stream = gifEncoder.createReadStream();
     gifEncoder.start()
 
-    for(let i = 0; i < images.length; i++) {
-      const image = images[i]
-      const canvas = createCanvas(canvasWidth, canvasHeight)
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(image, 0, 0)
-      gifEncoder.addFrame(ctx.getImageData(0, 0, canvasWidth, canvasHeight).data)
+
+    for (const frame of this.frames) {
+      gifEncoder.addFrame(frame);
     }
     gifEncoder.finish()
 
@@ -125,16 +148,16 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
     const { APP_BASE_URL } = AppConfigService
     const BASE_URL = `${APP_BASE_URL}/minesweeper/${this.data.uuid}`
     
-    const minesweeper: Minesweeper = new Minesweeper(JSON.parse(await AppConfigService.redis.client.get(this.redisKey)))
+    const minesweeper = this.minesweeper
     let str = `<h3 align="center">A classic Minesweeper</h3>\n`
     str += `<p align="center">\n`
     str += minesweeper.map.map(row => `${row.map(cell => cell.hidden ? `  <a href="${BASE_URL}/click?x=${cell.x}&y=${cell.y}">${cell.toEmoji()}</a>\n` : `  <span>${cell.toEmoji()}</span>\n`).join('')}`).join('  <br>\n')
     str += `</p>\n`
     if(minesweeper.gameStatus === "Not Started") str += `<p align="center">Come on, try it</p>\n`
-    else if(minesweeper.gameStatus === "Started") str += `<p align="center">Keep clearing, there are still many mines left.</p>\n`
+    else if(minesweeper.gameStatus === "Running") str += `<p align="center">Keep clearing, there are still many mines left.</p>\n`
     else str += minesweeper.gameLoosed ? `<p align="center">You lost don't hesitate to try again</p>\n` : `<p align="center">Congrats you won !</p>\n`
     
-    const historyLength = Object.values(await AppConfigService.redis.client.hGetAll(commandOptions({ returnBuffers: true }), this.redisImagesKey)).length
+    const historyLength = this.minesweeper.history.length
     if(historyLength > 1) str += `<p align="center">\n  <img width="256" src="${BASE_URL}/gif" />\n</p>\n`
 
     str += `<h3 align="center">\n  <a href="${BASE_URL}/new">Reset Game</a>\n</h3>\n\n<hr>\n\n`

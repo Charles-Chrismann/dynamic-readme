@@ -6,18 +6,17 @@ import { Response } from "express";
 import { Logger } from "@nestjs/common";
 
 class ReadmeService {
-	currentContentSha: string | null = null;
-	startDateRender: number;
+	private currentContentSha: string | null = null;
 	private logger = new Logger("ReadmeService")
 
 	async push(octokit: Octokit, message: string, content: string, sha: string): Promise<string> {
-		const config = AppConfigService.getOrThrow<AppConfig>('config')
+		const { name, owner, path } = State.getConfig('datas.repo')
 		return (await octokit.request(
-			`PUT /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
+			`PUT /repos/${owner}/${name}/contents/${path}`,
 			{
-				owner: config.datas.repo.owner,
-				repo: config.datas.repo.name,
-				path: config.datas.repo.readme.path,
+				owner,
+				repo: name,
+				path,
 				message,
 				committer: {
 					name: process.env.OCTO_COMMITTER_NAME,
@@ -41,7 +40,6 @@ class ReadmeService {
 
 	async commitAndPush(commitMessage: string, readmeContent: string) {
 		const config = AppConfigService.getOrThrow('config')
-		this.startDateRender = Date.now();
 		const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 
 		let sha: string | any = this.currentContentSha
@@ -57,8 +55,10 @@ class ReadmeService {
 		try {
 			pushRespSha = await this.push(octokit, commitMessage, base64, sha)
 		} catch (e) {
-			this.currentContentSha = (await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)).data.sha
-			pushRespSha = await this.push(octokit, commitMessage, base64, this.currentContentSha)
+			this.currentContentSha = (
+				await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)
+			).data.sha
+			pushRespSha = await this.push(octokit, commitMessage, base64, this.currentContentSha!)
 		}
 		this.currentContentSha = pushRespSha;
 	}
@@ -73,7 +73,8 @@ class ReadmeService {
 
 		await this.renderCommitAndPush(commitMessage)
 
-		const url = AppConfigService.getOrThrow<AppConfig['datas']['repo']['url']>('config.datas.repo.url')
+		const { owner, name } = State.getConfig('datas.repo')
+		const url = `https://github.com/${owner}/${name}`
 		if(AppConfigService.getOrThrow('NODE_ENV') === "production") res.redirect(url + redirectUrlFragment)
 		else res.redirect(`${AppConfigService.APP_BASE_URL}/render${redirectUrlFragment}`)
 	}
@@ -88,7 +89,8 @@ class ReadmeService {
 		if(redirectUrlFragment && !redirectUrlFragment.startsWith('#'))
 			throw new Error(`redirectUrlFragment should start with #, received: ${redirectUrlFragment}`)
 
-		const url = AppConfigService.getOrThrow<AppConfig['datas']['repo']['url']>('config.datas.repo.url')
+		const { owner, name } = State.getConfig('datas.repo')
+		const url = `https://github.com/${owner}/${name}`
 		if(AppConfigService.getOrThrow('NODE_ENV') === "production") res.redirect(url + redirectUrlFragment)
 		else res.redirect(`${AppConfigService.APP_BASE_URL}/render${redirectUrlFragment}`)
 	}

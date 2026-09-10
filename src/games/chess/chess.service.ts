@@ -8,7 +8,7 @@ import { ChessDynamicModule } from 'src/modules';
 @Injectable()
 export class ChessService {
   
-  async new(id: string, res?: Response) {
+  async new(id: string, res: Response) {
     const module = State.modules.find(
       m => m.data['uuid'] === id
     ) as ChessDynamicModule

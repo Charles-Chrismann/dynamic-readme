@@ -20,22 +20,3 @@ services:
     command: npm run start:dev
     ports:
       - 3000:${APP_PORT}
-    networks:
-      - app-network
-    depends_on:
-      - redis-dev
-  redis-dev:
-    container_name: dr-dev-redis
-    restart: unless-stopped
-    image: redis:alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-data:/data
-    networks:
-      - app-network
-
-volumes:
-  redis-data:
-networks:
-  app-network:

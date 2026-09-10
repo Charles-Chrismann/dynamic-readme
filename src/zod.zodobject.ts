@@ -148,31 +148,18 @@ export const ConfigSchema = z.object({
     repo: z.object({
       name: z.string(),
       owner: z.string(),
-      url: z.url({
-        protocol: /^https$/,
-        hostname: /^github.com$/
-      }),
-      readme: z.object({
-        path: z.string()
-      })
-    }),
-    perso: z.object({
-      homepage: z.url({
-        protocol: /^https$/,
-        hostname: /^github.com$/
-      }),
-      username: z.string(),
+      path: z.string()
+    }).optional(),
+    user: z.object({
+      login: z.string(),
       firstname: z.string(),
       lastname: z.string(),
-      description: z.array(
-        z.string()
-      ),
-      facts: z.object({
-        title: z.string(),
-        content: z.array(
-          z.string()
+      description: z.union([
+        z.string(),
+        z.array(
+          z.string(),
         ),
-      }),
+      ]),
       socials: z.array(
         z.object({
           name: z.enum([
@@ -183,7 +170,7 @@ export const ConfigSchema = z.object({
           icon_url: z.url(),
         })
       )
-    }),
+    }).optional(),
     skills: z.record(
       z.string(), z.object({
         title: z.string(),
@@ -197,9 +184,76 @@ export const ConfigSchema = z.object({
           })
         )
       })
-    ),
+    ).optional(),
     "3rdParty": z.object({
       views_count: z.url(),
     }).optional()
   })
 })
+
+export type Config = z.output<typeof ConfigSchema>
+
+export const wordleSchema = z.object({
+  todayWordle: z.object({
+    word: z.string(),
+    guessed: z.boolean(),
+    guesses: z.array(
+      z.object({
+        username: z.string(),
+        userId: z.number(),
+        guess: z.object({
+          valid: z.boolean(),
+          letters: z.array(
+            z.object({
+              value: z.string(),
+              status: z.enum([
+                "correct",
+                "present",
+                "absent",
+              ])
+            })
+          )
+        })
+      })
+    )
+  }),
+  scoreboard: z.array(
+    z.object({
+      username: z.string(),
+      userId: z.number(),
+      guesses: z.number(),
+    })
+  )
+})
+
+export type Wordle = z.output<typeof wordleSchema>
+
+export const cellSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  value: z.number(),
+  hidden: z.boolean(),
+})
+
+export const minesweeperSchema = z.object({
+  id: z.string(),
+  map: z.array(
+    z.array(
+      cellSchema
+    )
+  ),
+  history: z.array(
+    z.tuple([z.number(), z.number()])
+  ),
+})
+
+export type Minesweeper = z.output<typeof minesweeperSchema>
+
+export const chessSchema = z.object({
+  fen: z.string(),
+  history: z.array(
+    z.string()
+  )
+})
+
+export type ChessSave = z.output<typeof chessSchema>

@@ -6,79 +6,76 @@ import { createCanvas, ImageData } from '@napi-rs/canvas';
 import { compress, decompress } from 'compress-json';
 import { Response } from 'express';
 import { Cron } from '@nestjs/schedule';
-import { RedisService } from 'src/redis/redis.service';
 import { GifEncoder } from '@skyra/gifenc';
 import IReadmeModule from 'src/declarations/readme-module.interface';
 const Gameboy = require('serverboy')
 
-const rom = fs.readFileSync(path.join(process.env.PWD, 'roms', process.env.ROM_NAME))
+const rom = fs.readFileSync(path.join(process.env.PWD!, 'roms', process.env.ROM_NAME!))
 
 @Injectable()
 export class GameboyService implements OnModuleInit, IReadmeModule {
   private readonly logger = new Logger(GameboyService.name)
 
   gameboy_instance: any
-  renderInterval: NodeJS.Timer | null
-  renderTimeout: NodeJS.Timeout | null
+  // renderInterval: NodeJS.Timer | null
+  // renderTimeout: NodeJS.Timeout | null
   lastInputFrames: number[][] = []
 
-  constructor(private readonly redis: RedisService) {}
-
   async onModuleInit() {
-    const gi = JSON.parse(await this.redis.client.get('gameboy:instance'))
-    if(gi) {
-      this.load(gi)
-    }
-    else {
-      this.gameboy_instance = new Gameboy()
-      this.gameboy_instance.loadRom(rom)
-      this.setRenderSession()
-    }
+    // const gi = JSON.parse(await this.redis.client.get('gameboy:instance'))
+    // if(gi) {
+    //   this.load(gi)
+    // }
+    // else {
+    //   this.gameboy_instance = new Gameboy()
+    //   this.gameboy_instance.loadRom(rom)
+    //   this.setRenderSession()
+    // }
   }
 
-  @Cron(process.env.EMU_BACKUP_CRON)
-  async backup() {
-    this.logger.log('[SHEDULED] Saving gameboy')
-    const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
-    this.redis.client.set('gameboy:instance', JSON.stringify(compress(save)))
-  }
+  // @Cron(process.env.EMU_BACKUP_CRON)
+  // async backup() {
+  //   this.logger.log('[SHEDULED] Saving gameboy')
+  //   const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
+  //   this.redis.client.set('gameboy:instance', JSON.stringify(compress(save)))
+  // }
 
-  setRenderInterval(frameInterval = 5) {
-    this.renderInterval = setInterval(() => {
-      this.gameboy_instance.doFrame()
-    }, frameInterval)
-  }
+  // setRenderInterval(frameInterval = 5) {
+  //   this.renderInterval = setInterval(() => {
+  //     this.gameboy_instance.doFrame()
+  //   }, frameInterval)
+  // }
 
-  stopRenderInterval(intervalId) {
-    clearInterval(intervalId)
-  }
+  // stopRenderInterval(intervalId) {
+  //   clearInterval(intervalId)
+  // }
 
-  setRenderTimeout(intervalId, timeout = 60000) {
-    this.renderTimeout = setTimeout(() => this.stopRenderInterval(intervalId), timeout)
-  }
+  // setRenderTimeout(intervalId, timeout = 60000) {
+  //   this.renderTimeout = setTimeout(() => this.stopRenderInterval(intervalId), timeout)
+  // }
 
-  stopRenderTimeout() {
-    clearTimeout(this.renderTimeout)
-  }
+  // stopRenderTimeout() {
+  //   clearTimeout(this.renderTimeout)
+  // }
 
-  setRenderSession() {
-    this.setRenderInterval()
-    this.setRenderTimeout(this.renderInterval)
-  }
+  // setRenderSession() {
+  //   this.setRenderInterval()
+  //   this.setRenderTimeout(this.renderInterval)
+  // }
 
-  stopRenderSession() {
-    this.stopRenderInterval(this.renderInterval)
-    this.stopRenderTimeout()
-  }
+  // stopRenderSession() {
+  //   this.stopRenderInterval(this.renderInterval)
+  //   this.stopRenderTimeout()
+  // }
 
-  skipFrames(n) {
-    const frames = []
-    for(let i = 0; i < n; i++) {
-      if(i % 4 === 0) frames.push(this.gameboy_instance.doFrame())
-      else this.gameboy_instance.doFrame()
-    }
-    return frames
-  }
+  // skipFrames(n) {
+  //   const frames = []
+  //   for(let i = 0; i < n; i++) {
+  //     if(i % 4 === 0) frames.push(this.gameboy_instance.doFrame())
+  //     else this.gameboy_instance.doFrame()
+  //   }
+  //   return frames
+  // }
 
   async frame(res: Response) {
     const canvas = createCanvas(160, 144)
@@ -122,56 +119,56 @@ export class GameboyService implements OnModuleInit, IReadmeModule {
     gifEncoder.finish();
   }
 
-  input(input: string) {
-    this.stopRenderSession()
-    this.lastInputFrames = []
+  // input(input: string) {
+  //   this.stopRenderSession()
+  //   this.lastInputFrames = []
 
-    for(let i = 0; i < 5; i++) {
-      this.gameboy_instance.pressKey(input)
-      this.lastInputFrames.push(this.gameboy_instance.doFrame())
-    }
+  //   for(let i = 0; i < 5; i++) {
+  //     this.gameboy_instance.pressKey(input)
+  //     this.lastInputFrames.push(this.gameboy_instance.doFrame())
+  //   }
 
-    this.lastInputFrames = this.lastInputFrames.concat(this.skipFrames(300))
+  //   this.lastInputFrames = this.lastInputFrames.concat(this.skipFrames(300))
 
-    this.setRenderSession()
-  }
+  //   this.setRenderSession()
+  // }
 
-  save(res) {
-    this.stopRenderSession()
-    const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
+  // save(res) {
+  //   this.stopRenderSession()
+  //   const save = this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saveState()
     
-    const stream = Readable.from(JSON.stringify(compress(save)));
+  //   const stream = Readable.from(JSON.stringify(compress(save)));
     
-    res.setHeader('Content-Type', 'application/json');
-    res.attachment('save.json')
-    stream.pipe(res)
-    this.setRenderSession()
-  }
+  //   res.setHeader('Content-Type', 'application/json');
+  //   res.attachment('save.json')
+  //   stream.pipe(res)
+  //   this.setRenderSession()
+  // }
 
-  load(loadObj) {
-    this.stopRenderSession()
+  // load(loadObj) {
+  //   this.stopRenderSession()
 
-    this.gameboy_instance = new Gameboy()
-    this.gameboy_instance.loadRom(rom)
-    this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saving(decompress(loadObj))
+  //   this.gameboy_instance = new Gameboy()
+  //   this.gameboy_instance.loadRom(rom)
+  //   this.gameboy_instance[Object.keys(this.gameboy_instance)[0]].gameboy.saving(decompress(loadObj))
 
-    this.setRenderSession()
-  }
+  //   this.setRenderSession()
+  // }
 
-  async renderInputBoard(BASE_URL: string) {
-    let str = `<table align="center">\n  <thead>\n`
-    str += '    <tr>\n      <th colspan="4">Game Contributions</th>\n    </tr>\n'
-    str += `    <tr>\n      <th>Rank</th>\n      <th colspan="2">Player</th>\n      <th>Inputs</th>\n    </tr>\n  </thead>\n  <tbody>\n`
-    const playersIds = await this.redis.client.keys("gameboy:players:*")
-    const players = await Promise.all(playersIds.map(player => this.redis.client.hGetAll(player)))
-    const users = await Promise.all(players.map(player => this.redis.client.hGetAll(`user:${player.id}`)))
-    const rowsDatas = players.map((player, index) => ({...player, ...users[index]})).sort((a, b) => +b.inputCount - +a.inputCount)
-    str += rowsDatas.map((row, i) => `    <tr>\n      <td align="center">${i + 1}</td>\n      <td align="center"><a href="https://github.com/${row.login}"><img src="${row.avatar_url}" alt="profil picture" width="40"></img></td>\n      <td align="center"><a href="https://github.com/${row.login}">@${row.login}</a></td>\n      <td align="center">${row.inputCount}</td>\n    </tr>\n`).join('')
-    str += `    <tr>\n      <td colspan="4" align="center"><a href="${BASE_URL}/client.html">Play with your Github account here !</a></td>\n    </tr>\n`
-    str += `  </tbody>\n</table>\n\n`
+  // async renderInputBoard(BASE_URL: string) {
+  //   let str = `<table align="center">\n  <thead>\n`
+  //   str += '    <tr>\n      <th colspan="4">Game Contributions</th>\n    </tr>\n'
+  //   str += `    <tr>\n      <th>Rank</th>\n      <th colspan="2">Player</th>\n      <th>Inputs</th>\n    </tr>\n  </thead>\n  <tbody>\n`
+  //   const playersIds = await this.redis.client.keys("gameboy:players:*")
+  //   const players = await Promise.all(playersIds.map(player => this.redis.client.hGetAll(player)))
+  //   const users = await Promise.all(players.map(player => this.redis.client.hGetAll(`user:${player.id}`)))
+  //   const rowsDatas = players.map((player, index) => ({...player, ...users[index]})).sort((a, b) => +b.inputCount - +a.inputCount)
+  //   str += rowsDatas.map((row, i) => `    <tr>\n      <td align="center">${i + 1}</td>\n      <td align="center"><a href="https://github.com/${row.login}"><img src="${row.avatar_url}" alt="profil picture" width="40"></img></td>\n      <td align="center"><a href="https://github.com/${row.login}">@${row.login}</a></td>\n      <td align="center">${row.inputCount}</td>\n    </tr>\n`).join('')
+  //   str += `    <tr>\n      <td colspan="4" align="center"><a href="${BASE_URL}/client.html">Play with your Github account here !</a></td>\n    </tr>\n`
+  //   str += `  </tbody>\n</table>\n\n`
 
-    return str
-  }
+  //   return str
+  // }
 
   async toMd(BASE_URL: string) {
     let str = `<h3 align="center">GitHub Plays Pokemon ?</h3>\n`
@@ -206,7 +203,7 @@ export class GameboyService implements OnModuleInit, IReadmeModule {
     str += `  <br>\n`
     str += `  <a href="${BASE_URL}/gameboy/input">\n    <img src="./assets/gameboy/bot-bot.png" width="308">\n  </a>\n\n`
 
-    str += await this.renderInputBoard(BASE_URL)
+    // str += await this.renderInputBoard(BASE_URL)
 
     str += `</p>\n\n<hr>\n\n`
 

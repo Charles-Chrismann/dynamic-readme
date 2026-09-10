@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { WordleDynamicModule } from 'src/modules';
 import State from 'src/State';
 import { ReadmeService } from 'src/services';
@@ -24,6 +24,8 @@ export class WordleService {
     const module = State.modules.find(
       m => m instanceof WordleDynamicModule
     )
+
+    if(!module) throw new NotFoundException('Wordle module not foud')
 
     await module.guess(guess, issuer, issuerId);
 

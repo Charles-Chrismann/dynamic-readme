@@ -3,7 +3,8 @@ import { AbstractDynamicModule } from "../abstract.module";
 import { Chess, Piece, Square } from "chess.js";
 import { MoveInstruction } from "src/games/chess/declarations";
 import { AppConfigService } from "src/services";
-import { utils } from "src/games/chess/classes/utils";
+import { readFile, writeFile } from "fs/promises";
+import { ChessSave, chessSchema } from "src/zod.zodobject";
 
 interface Data {
   uuid: string
@@ -13,15 +14,32 @@ interface Options {
 }
 
 export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
-
-  redisKey: string
-  public boardBuffer: Buffer
+  chess!: Chess
+  public boardBuffer!: Buffer
   private static piecesMap: Map<string, Image> | undefined
 
   async init() {
-    this.redisKey = `chess:${this.data['uuid']}`
-    if(!await AppConfigService.redis.client.get(this.redisKey)) await this.new()
+    try {
+      const chessDataStr = (await readFile(`./config/datas/chess.json`))
+      const chessData = chessSchema.parse(chessDataStr)
+      const { fen } = chessData
+      
+      this.chess = new Chess(fen)
+      await this.renderBoardImage()
+      this.needsRender = true
+    } catch (err: unknown) {
+      await this.new()
+      await this.save()
+    }
     await ChessDynamicModule.loadAssets()
+  }
+
+  async save() {
+    const data: ChessSave = {
+      fen: this.chess.fen(),
+      history: []
+    }
+    await writeFile(`./config/datas/chess.json`, JSON.stringify(data))
   }
 
   static async loadAssets() {
@@ -74,14 +92,13 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
 
   async new() {
     const chess = new Chess()
-    await AppConfigService.redis.client.set(this.redisKey, chess.fen())
     this.renderBoardImage()
     this.needsRender = true
   }
 
   async move(moveInstruction: MoveInstruction) {
 
-    const chess = new Chess(await AppConfigService.redis.client.get(this.redisKey))
+    const chess = this.chess
 
     try {
       chess.move({
@@ -89,7 +106,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
         to: moveInstruction.to,
       })
 
-      await AppConfigService.redis.client.set(this.redisKey, chess.fen())
+      await this.save()
       this.needsRender = true
 
       return true
@@ -127,7 +144,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
       ctx.fillStyle = currentColor
     }
   
-    const chess = new Chess(await AppConfigService.redis.client.get(this.redisKey))
+    const chess = this.chess
 
     for(const row of chess.board()) {
       for(const square of row) {
@@ -136,7 +153,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
         const [x, y] = square.square.split('')
 
         ctx.drawImage(
-          ChessDynamicModule.piecesMap.get(`${square.color}${square.type}`),
+          ChessDynamicModule.piecesMap!.get(`${square.color}${square.type}`)!,
           ["a", "b", "c", "d", "e", "f", "g", "h"].indexOf(x) * tileSize,
           (8 - (+y)) * tileSize,
           tileSize,
@@ -163,8 +180,22 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
     return this.boardBuffer
   }
 
+  static getletterFromNumber(number: number) {
+    let numbers = [
+      ":eight:",
+      ":seven:",
+      ":six:",
+      ":five:",
+      ":four:",
+      ":three:",
+      ":two:",
+      ":one:",
+    ]
+  return numbers[number]
+}
+
   public async render(): Promise<string> {
-    const chess = new Chess(await AppConfigService.redis.client.get(this.redisKey))
+    const chess = this.chess
     const BASE_URL = `${AppConfigService.APP_BASE_URL}/chess/${this.data.uuid}`
   
     let md = `<h3 align="center">A classic Chess</h3>\n`
@@ -178,7 +209,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
   
     md += `<table align="center">\n  <tbody>\n`
     chess.board().forEach((row, y) => {
-      md += `    <tr>\n      <td align="center">${utils.getletterFromNumber(y)}</td>\n`
+      md += `    <tr>\n      <td align="center">${ChessDynamicModule.getletterFromNumber(y)}</td>\n`
       row.forEach((piece) => {
         md += `      <td align="center">${piece ? (piece.color === chess.turn() && chess.moves({ square: piece.square }).length ? `\n        <details>\n          <summary>${ChessDynamicModule.pieces[piece.type][piece.color]}</summary>\n          ${this.computeMoveString(chess, piece)}\n        </details>\n` : ChessDynamicModule.pieces[piece.type][piece.color]
       ): "‎ "}      </td>\n`

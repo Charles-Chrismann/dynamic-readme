@@ -25,7 +25,7 @@ export class LinesStaticModule extends AbstractStaticModule<Data, Options> {
       lines = lines.slice(start - 1, end)
     }
 
-    const md = lines.map(l => `<p>${l}</p>\n`).join('')
+    const md = lines.map((l: string) => `<p>${l}</p>\n`).join('')
     
     return md
   }

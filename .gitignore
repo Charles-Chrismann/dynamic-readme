@@ -11,7 +11,15 @@ config.json
 public/board.png
 public/minesweeper.gif
 
-roms/*
-!roms/.gitkeep
-
 package-lock.json
+config/*
+!config/.gitkeep
+
+!config/datas/
+config/datas/*
+!config/datas/config.default.json
+!config/datas/.gitkeep
+
+!config/roms/
+config/roms/*
+!config/roms/.gitkeep

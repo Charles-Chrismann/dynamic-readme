@@ -20,6 +20,6 @@ export class ListStaticModule extends AbstractStaticModule<Data, Options> {
 
     const {title, content} = list
 
-    return `${title ? `<p>${title}</p>\n` : ''}<ul>\n${content.map(l => `  <li>${l}</li>\n`).join('')}</ul>\n`
+    return `${title ? `<p>${title}</p>\n` : ''}<ul>\n${content.map((l: string) => `  <li>${l}</li>\n`).join('')}</ul>\n`
   }
 }

@@ -1,6 +1,7 @@
 import { AppConfigService } from "src/services";
 import { AbstractStaticModule } from "../abstract.module";
 import { AppConfig } from "src/declaration";
+import State from "src/State";
 
 interface Data {
 }
@@ -11,7 +12,7 @@ interface Options {
 
 export class SkillsStaticModule extends AbstractStaticModule<Data, Options> {
   public render(): string | Promise<string> {
-    const skills = AppConfigService.getOrThrow<AppConfig['datas']['skills']>('config.datas.skills');
+    const skills = State.getConfig('datas.skills');
     let md = ''
 
     md += `<h1 align="center">Technical skills</h1>\n`;

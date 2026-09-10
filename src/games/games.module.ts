@@ -5,10 +5,9 @@ import { ChessService } from './chess/chess.service';
 import { ChessController } from './chess/chess.controller';
 import { WordleService } from './wordle/wordle.service';
 import { WordleController } from './wordle/wordle.controller';
-import { RedisModule } from 'src/redis/redis.module';
 import { GameboyController } from './gameboy/gameboy.controller';
 import { GameboyService } from './gameboy/gameboy.service';
-import { GameboyGateway } from './gameboy/gameboy.gateway';
+// import { GameboyGateway } from './gameboy/gameboy.gateway';
 import { AuthModule } from 'src/auth/auth.module';
 
 import { GbaService } from './gba/gba.service';
@@ -17,7 +16,6 @@ import { AppConfigService } from 'src/services';
 
 @Module({
   imports: [
-    RedisModule,
     AuthModule
   ],
   controllers: [
