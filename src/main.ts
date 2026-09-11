@@ -9,6 +9,10 @@ async function bootstrap() {
       : ['log', 'warn', 'error', 'fatal']
   });
   app.useBodyParser('json', { limit: '100mb' });
+
+  app.setBaseViewsDir('./views');
+  app.setViewEngine('hbs');
+
   app.enableCors()
   await app.listen(process.env.APP_PORT!);
   console.log(`Application is running on: ${await app.getUrl()}`)

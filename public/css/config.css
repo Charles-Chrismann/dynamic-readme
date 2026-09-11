@@ -1,0 +1,12 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+textarea {
+	width: 100%;
+	resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}

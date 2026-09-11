@@ -4,18 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="/css/config.css">
 </head>
 <body>
   <section>
-    <label for="trust-token">
-      Set the GH_ACTION_TRUST token to interact
-    </label>
-    <input type="text" id="trust-token">
+    <p id="token">{{ token }}</p>
   </section>
   <section>
-    
-    <textarea name="" id=""></textarea>
+    <textarea name="" id="">{{ configStr }}</textarea>
   </section>
-  <script src="/js/index.js"></script>
+  <button>Update config</button>
+  <script src="/js/config.js"></script>
 </body>
 </html>

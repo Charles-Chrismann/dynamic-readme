@@ -19,6 +19,17 @@ import {
 import { MinesweeperDynamicModule } from './modules/dynamics/minesweeper.module';
 import { ChessDynamicModule } from './modules/dynamics/chess.module';
 import { RequestService } from './services';
+import {
+  mkdir,
+  readFile,
+  rm,
+  writeFile
+} from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
+import { Response } from 'express';
+import { ZipArchive } from 'archiver';
+import unzipper from 'unzipper';
+import { Readable } from 'stream';
 
 type ModuleConstructor<TData = any, TOptions = any> = new (data: TData, options?: TOptions) => AbstractModule<TData, TOptions>;
 
@@ -44,6 +55,27 @@ class State {
   public modules: AbstractModule[] = []
   public startRenderTimestamp!: number
   private config: Config | null = null
+
+  async getConfigOrDefaultOrNull(): Promise<Config | null> {
+    const [customConfig, defaultConfig] = await Promise.allSettled([
+      readFile('./config/datas/config.json', 'utf-8'),
+      readFile('./config/datas/config.default.json', 'utf-8'),
+    ])
+    let conf = customConfig.status === 'fulfilled' ? customConfig.value
+      : defaultConfig.status === 'fulfilled' ? defaultConfig.value : null
+
+    if(conf !== null) {
+      return ConfigSchema.parse(JSON.parse(conf))
+    }
+
+    return conf
+  }
+
+  async setConfig(unsafe_config: Record<string, any>) {
+    const config = ConfigSchema.parse(unsafe_config)
+    await writeFile(`./config/datas/config.json`, JSON.stringify(config))
+    await this.init(config)
+  }
 
   async init(unsafe_config: Record<string, any>) {
   
@@ -97,6 +129,7 @@ class State {
       this.modules.push(createdModule)
     }
     await Promise.all(moduleInitPromises)
+    console.log(this.config)
   }
 
   async render() {
@@ -142,6 +175,47 @@ class State {
     }
 
     return value as NonNullable<PathValue<Config, P>>;
+  }
+
+  async exportConfig(res: Response) {
+    const archive = new ZipArchive({
+      zlib: { level: 9 },
+    });
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="config.zip"',
+    );
+
+    archive.on('warning', (err) => {
+      if (err.code !== 'ENOENT') {
+        res.destroy(err);
+      }
+    });
+
+    archive.on('error', (err) => {
+      res.destroy(err);
+    });
+
+    archive.pipe(res);
+    archive.directory(`./config`, false);
+
+    await archive.finalize();
+  }
+
+  async importConfig(file: any) {
+    await rm(`./config`, { recursive: true })
+
+    await Readable.from(file.buffer)
+      .pipe(unzipper.Extract({ path: `./` }))
+      .promise();
+
+    const config = await this.getConfigOrDefaultOrNull()
+    
+    if(config) {
+      await this.init(config)
+    }
   }
 }
 

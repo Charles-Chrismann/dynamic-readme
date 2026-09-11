@@ -23,6 +23,7 @@ interface Options {
 
 export class ElementStaticModule extends AbstractStaticModule<Data, Options> {
   public render(): string | Promise<string> {
+    console.log(this.data)
     let md = isVoidElement(this.data.element)
       ? `<${this.data.element} />`
       : `<${this.data.element}${this.options?.align ? ` align="${this.options?.align}"` : `` }>${this.data.content}</${this.data.element}>\n`

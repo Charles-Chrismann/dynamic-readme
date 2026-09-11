@@ -3,13 +3,6 @@ import State from './State';
 
 @Injectable()
 export class AppService {
-
-  constructor() {}
-
-  getHello(): string {
-    return 'Hello World!';
-  }
-
   async render() {
     const content = await State.render()
 
@@ -24,5 +17,15 @@ export class AppService {
     ${content}
 </body>
 </html>`
+  }
+
+  config(token: string) {
+    const config = State.getConfig()
+    const configStr = JSON.stringify(config, null, 2)
+    console.log(configStr)
+    return {
+      configStr,
+      token,
+    }
   }
 }

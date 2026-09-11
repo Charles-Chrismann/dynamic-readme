@@ -31,6 +31,7 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
 
   public async init(): Promise<void> {
 
+    console.log(`./config/roms/${process.env.ROM_GBA_NAME}`)
     const rom = await readFile(`./config/roms/${process.env.ROM_GBA_NAME}`)
 
     this.gba_wrapper = new Wrapper({
@@ -38,9 +39,13 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
       canvas: this.canvas,
       updateMethod: 'manual'
     })
-    const gi = await readFile(`./config/datas/gba.txt`)
-    if(gi) {
-      await this.gba_wrapper.loadSaveState(gi)
+    try {
+      const gi = await readFile(`./config/datas/gba.txt`)
+      if(gi) {
+        await this.gba_wrapper.loadSaveState(gi)
+      }
+    } catch (err: unknown) {
+      this.logger.log('Starting gba module without save')
     }
 
     const frames = this.skipFrames(600, true)

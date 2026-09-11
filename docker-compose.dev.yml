@@ -2,21 +2,27 @@ services:
   dynamic-readme:
     container_name: dr-dev-app
     restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
     develop:
       watch:
         - action: sync
           path: .
           target: /usr/src/app
+          ignore:
+            - node_modules/
+            - .git/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: pnpm-lock.yaml
     volumes:
       - ./config.json:/usr/src/app/config.json
-    build:
-      context: .
-      dockerfile: Dockerfile
     env_file:
       - .env.dev
     environment:
       - NODE_ENV=development
-      # - NO_COMMIT=true
-    command: npm run start:dev
+    command: pnpm run start:dev
     ports:
-      - 3000:${APP_PORT}
+      - "3000:${APP_PORT}"

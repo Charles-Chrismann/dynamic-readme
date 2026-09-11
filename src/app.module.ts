@@ -19,27 +19,6 @@ import { AppConfigService, RequestService } from './services';
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
-      // load: [
-      //   async () => {
-      //     console.log(1)
-      //     const [customConfig, defaultConfig] = await Promise.allSettled([
-      //       fs.readFile('./config/datas/config.json', 'utf-8'),
-      //       fs.readFile('./config/datas/config.default.json', 'utf-8'),
-      //     ])
-
-      //     let conf = customConfig.status === 'fulfilled' ? customConfig.value
-      //       : defaultConfig.status === 'fulfilled' ? defaultConfig.value : null
-
-      //     if(!conf) throw new Error(`No custom configuration provided, no default configuration available`)
-          
-          
-      //     const unsafe_config = JSON.parse(conf)
-      //     console.log(2)
-      //     const config = ConfigSchema.parse(unsafe_config)
-      //     console.log(config)
-      //     return { config }
-      //   }
-      // ]
     }),
     ScheduleModule.forRoot(),
     GamesModule,
@@ -61,18 +40,11 @@ export class AppModule implements OnModuleInit {
   private readonly logger = new Logger(AppModule.name);
 
   async onModuleInit() {
-    const [customConfig, defaultConfig] = await Promise.allSettled([
-      fs.readFile('./config/datas/config.json', 'utf-8'),
-      fs.readFile('./config/datas/config.default.json', 'utf-8'),
-    ])
-    let conf = customConfig.status === 'fulfilled' ? customConfig.value
-      : defaultConfig.status === 'fulfilled' ? defaultConfig.value : null
-      
-    if(!conf) {
+    let config = await State.getConfigOrDefaultOrNull()
+    if(!config) {
       this.logger.log('App starting with no configuration, Sate.render method will fail if no configuration set.')
       return
     }
-    const config = JSON.parse(conf)
     console.log(config)
     State.init(config)
   }

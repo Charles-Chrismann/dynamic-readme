@@ -4,4 +4,4 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install
 COPY . .
-RUN npm run build
+RUN pnpm run build
