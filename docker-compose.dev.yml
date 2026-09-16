@@ -3,6 +3,7 @@ services:
     container_name: dr-dev-app
     restart: unless-stopped
     build:
+      target: dev
       context: .
       dockerfile: Dockerfile
     develop:
@@ -17,8 +18,8 @@ services:
           path: package.json
         - action: rebuild
           path: pnpm-lock.yaml
-    volumes:
-      - ./config:/usr/src/app/config
+    # volumes:
+    #   - ./config:/usr/src/app/config
     env_file:
       - .env.dev
     environment:

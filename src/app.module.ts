@@ -62,7 +62,7 @@ export class AppModule implements OnModuleInit {
   async onModuleInit() {
     let config = await State.getConfigOrDefaultOrNull()
     if(!config) {
-      this.logger.log('App starting with no configuration, Sate.render method will fail if no configuration set.')
+      this.logger.warn('App starting with no configuration, Sate.render method will fail if no configuration set.')
       return
     }
     await State.init(config)

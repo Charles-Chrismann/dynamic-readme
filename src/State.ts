@@ -226,11 +226,11 @@ class State {
     );
 
     await Readable.from(file.buffer)
-      .pipe(unzipper.Extract({ path: `./` }))
+      .pipe(unzipper.Extract({ path: directory }))
       .promise();
 
     const config = await this.getConfigOrDefaultOrNull()
-    
+
     if(config) {
       await this.init(config)
     }
