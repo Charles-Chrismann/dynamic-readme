@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import State from './State';
+import { Config } from './zod.zodobject';
 
 @Injectable()
 export class AppService {
@@ -20,7 +21,12 @@ export class AppService {
   }
 
   config() {
-    const config = State.getConfig()
+    let config: Config
+    try {
+      config = State.getConfig()
+    } catch (err: unknown) {
+      config = {structure: [], datas: {}}
+    }
     const configStr = JSON.stringify(config, null, 2)
     return {
       configStr,
