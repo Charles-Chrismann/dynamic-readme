@@ -3,7 +3,7 @@ import { AbstractDynamicModule } from "../abstract.module";
 import { Chess, Piece, Square } from "chess.js";
 import { MoveInstruction } from "src/games/chess/declarations";
 import { AppConfigService } from "src/services";
-import { readFile, writeFile } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { ChessSave, chessSchema } from "src/zod.zodobject";
 
 interface Data {
@@ -19,27 +19,38 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
   private static piecesMap: Map<string, Image> | undefined
 
   async init() {
+    await ChessDynamicModule.loadAssets()
     try {
       const chessDataStr = (await readFile(`./config/datas/chess.json`))
       const chessData = chessSchema.parse(chessDataStr)
-      const { fen } = chessData
-      
-      this.chess = new Chess(fen)
+      const { history } = chessData
+      const chess = new Chess()
+
+      for(const move of history) {
+        chess.move(move)
+      }
+
+      this.chess = chess
       await this.renderBoardImage()
       this.needsRender = true
     } catch (err: unknown) {
       await this.new()
       await this.save()
     }
-    await ChessDynamicModule.loadAssets()
   }
 
   async save() {
     const data: ChessSave = {
       fen: this.chess.fen(),
-      history: []
+      history: this.chess.history()
     }
-    await writeFile(`./config/datas/chess.json`, JSON.stringify(data))
+
+    const dir = './config/datas/chess';
+    await mkdir(dir, { recursive: true });
+    await writeFile(
+      `${dir}/${this.data['uuid']}.json`,
+      JSON.stringify(data)
+    );
   }
 
   static async loadAssets() {
@@ -92,6 +103,7 @@ export class ChessDynamicModule extends AbstractDynamicModule<Data, Options> {
 
   async new() {
     const chess = new Chess()
+    this.chess = chess
     this.renderBoardImage()
     this.needsRender = true
   }

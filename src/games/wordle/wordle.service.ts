@@ -8,14 +8,14 @@ import { Response } from 'express';
 export class WordleService {
 
   async guess(
-    GH_ACTION_TRUST: string,
+    API_AUTH_TOKEN: string,
     guess: string,
     issuer: string,
     issuerId: number,
     res: Response
   ) {
 
-    if(GH_ACTION_TRUST !== process.env.GH_ACTION_TRUST) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+    if(API_AUTH_TOKEN !== process.env.API_AUTH_TOKEN) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     if(!guess || guess.length !== 5) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     if(!issuer) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     if(!issuerId) throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);

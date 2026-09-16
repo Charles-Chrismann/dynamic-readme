@@ -16,13 +16,13 @@ export class WordleController {
   async guess(
     @Res() res: Response,
     @Body('guess') guess: string,
-    @Body('GH_ACTION_TRUST') GH_ACTION_TRUST: string,
+    @Body('API_AUTH_TOKEN') API_AUTH_TOKEN: string,
     @Body('issuer') issuer: string,
     @Body('issuerId') issuerId: number
   ) {
 
     return this.wordleService.guess(
-      GH_ACTION_TRUST,
+      API_AUTH_TOKEN,
       guess,
       issuer,
       issuerId,

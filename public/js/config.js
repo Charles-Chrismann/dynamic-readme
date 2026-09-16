@@ -1,6 +1,8 @@
 const textarea = document.querySelector('textarea');
 const updateConfigBtn = document.querySelector('button');
 const tokenP = document.querySelector('p#token');
+const importConfigInput = document.querySelector('input#import');
+const importConfigBtn = document.querySelector('button.import');
 
 textarea.style.height = 'auto';
 textarea.style.height = textarea.scrollHeight + 10 + 'px';
@@ -21,6 +23,19 @@ updateConfigBtn.addEventListener('click', async () => {
       'content-type': 'application/json',
       'token': tokenP.textContent
     },
-    body: JSON.stringify({ config: textarea.value })
+    body: JSON.stringify({ config: JSON.parse(textarea.value) })
   })
+})
+
+importConfigBtn.addEventListener('click', async () => {
+  if(!importConfigInput) return
+  const file = importConfigInput.files[0]
+  
+  const form = new FormData()
+  form.set('file', file)
+  
+  const response = await fetch("/config/import", {
+    method: "POST",
+    body: form,
+  });
 })

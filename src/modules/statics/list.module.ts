@@ -1,5 +1,6 @@
 import { AppConfigService } from "src/services";
 import { AbstractStaticModule } from "../abstract.module";
+import State from "src/State";
 
 interface Data {
   field: string
@@ -12,7 +13,7 @@ export class ListStaticModule extends AbstractStaticModule<Data, Options> {
   public render(): string | Promise<string> {
     
     const path = this.data.field.split('.')
-    let list: any = AppConfigService.getOrThrow('config.datas');
+    let list: any = State.getConfig('datas');
 
     for (let i = 0; i < path.length; i++) {
       list = list[path[i]];

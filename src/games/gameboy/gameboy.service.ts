@@ -101,7 +101,7 @@ export class GameboyService implements OnModuleInit, IReadmeModule {
     res.setHeader('Cache-Control', 'public, max-age=0')
 
     const gifEncoder = new GifEncoder(160, 144)
-    .setRepeat(-1)
+    .setRepeat(0)
     .setDelay(64)
     .setQuality(10);
     gifEncoder.createWriteStream().pipe(res)

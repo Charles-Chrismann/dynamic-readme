@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import State from './State';
 import { ConfigSchema } from './zod.zodobject';
 import { AppConfigService, RequestService } from './services';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -21,6 +22,25 @@ import { AppConfigService, RequestService } from './services';
       cache: true,
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'short',
+          ttl: 1000,
+          limit: 3,
+        },
+        {
+          name: 'medium',
+          ttl: 10000,
+          limit: 20
+        },
+        {
+          name: 'long',
+          ttl: 60000,
+          limit: 100
+        }
+      ],
+    }),
     GamesModule,
     TriggerModule,
     ServeStaticModule.forRoot({
@@ -45,7 +65,11 @@ export class AppModule implements OnModuleInit {
       this.logger.log('App starting with no configuration, Sate.render method will fail if no configuration set.')
       return
     }
-    console.log(config)
-    State.init(config)
+    await State.init(config)
+    try {
+      await State.render()
+    } catch (err: unknown) {
+      this.logger.warn(`Render test on startup failed, reason: ${JSON.stringify(err)}`)
+    }
   }
 }

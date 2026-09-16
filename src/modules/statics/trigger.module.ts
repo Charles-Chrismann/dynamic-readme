@@ -12,10 +12,7 @@ interface Options {
 export class TriggerStaticModule extends AbstractStaticModule<Data, Options> {
   public render(): string | Promise<string> {
     const owner = State.getConfig('datas.repo.owner');
-    const env = AppConfigService.getOrThrow<string>('NODE_ENV');
-    const BASE_URL = env === 'production'
-    ? AppConfigService.APP_BASE_URL
-    : "http://localhost:3000"
+    const BASE_URL = AppConfigService.getOrThrow<string>('APP_BASE_URL')
     let md = ''
     md += `<h1 align="center">Work in progress</h1>\n`;
     md += `<p align="center">Other features are in progress, feel free to follow me to discover them.</p>\n`;

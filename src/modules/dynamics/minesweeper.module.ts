@@ -5,7 +5,7 @@ import { AbstractDynamicModule } from "../abstract.module";
 import { Minesweeper } from "src/games/minesweeper/classes/Minesweeper";
 import { AppConfigService } from "src/services";
 import { buffer } from "stream/consumers";
-import { readFile, writeFile } from "fs/promises";
+import { mkdir, readFile, writeFile } from "fs/promises";
 import { minesweeperSchema } from "src/zod.zodobject";
 import type { Minesweeper as MinesweeperType } from '../../zod.zodobject'
 
@@ -39,6 +39,7 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
         const frame = await this.renderGameImageCtx(minesweeper)
         this.frames.push(frame)
       }
+      this.minesweeper = minesweeper
 
       this.generatehistoryGif()
 
@@ -55,7 +56,13 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
       history,
       map,
     }
-    await writeFile(`./config/datas/minesweeper/${this.data['uuid']}.json`, JSON.stringify(data))
+    const dir = './config/datas/minesweeper';
+
+    await mkdir(dir, { recursive: true });
+    await writeFile(
+      `${dir}/${this.data['uuid']}.json`,
+      JSON.stringify(data)
+    );
   }
 
   async new() {

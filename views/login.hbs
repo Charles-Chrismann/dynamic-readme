@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+<body>
+	<input type="password">
+	<button>Login</button>
+	<script>
+		const loginInput = document.querySelector('input')
+		const loginBtn = document.querySelector('button');
+
+		loginBtn.addEventListener('click', async () => {
+			const res = await fetch('/config/login', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					token: loginInput.value
+				})
+			})
+
+			if(res.ok) {
+				location.href = '/config'
+			}
+		})
+	</script>
+</body>
+</html>

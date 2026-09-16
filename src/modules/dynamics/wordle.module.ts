@@ -5,6 +5,7 @@ import ReadmeService from "src/services/ReadmeService";
 import { AppConfigService } from "src/services";
 import { readFile, writeFile } from "fs/promises";
 import { Wordle, wordleSchema } from "src/zod.zodobject";
+import State from "src/State";
 
 interface Data {
 }
@@ -114,7 +115,8 @@ export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
   }
 
   public async render(): Promise<string> {
-    const config = AppConfigService.getOrThrow('config')
+    const { name, owner } = State.getConfig('datas.repo')
+    const url = `https://github.com/${owner}/${name}`
     const { todayWordle, scoreBoard } = this
     let md = `<h3 align="center">A classic Wordle</h3>\n`
     md += `<table align="center">\n  <thead>\n    <tr>\n      <th colspan="5">Wordle</th><th>Player</th>\n    </tr>\n  </thead>\n  <tbody>\n`
@@ -125,7 +127,7 @@ export class WordleDynamicModule extends AbstractDynamicModule<Data, Options> {
       return `    <tr>\n${letterTds}      <td>\n        <a href="https://github.com/${guess.username}">@${guess.username}</a>\n      </td>\n    </tr>\n`
     }).join('')
 
-    md += `    <tr>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>\n        <a href="${config.datas.repo.url.endsWith('/') ? config.datas.repo.url.slice(0, -1) : config.datas.repo.url}/issues/new?body=Please+only+add+your+word+to+the+title.+Just+click+%22Submit+new+issue%22.+You+don%27t+need+to+do+anything+else+%3AD&title=Wordle%3A+">Submit a word</a>\n      </td>\n    </tr>\n`
+    md += `    <tr>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>‎ </td>\n      <td>\n        <a href="${url}/issues/new?body=Please+only+add+your+word+to+the+title.+Just+click+%22Submit+new+issue%22.+You+don%27t+need+to+do+anything+else+%3AD&title=Wordle%3A+">Submit a word</a>\n      </td>\n    </tr>\n`
     md += `  </tbody>\n</table>\n`
 
     md += `<table align="center">\n  <thead>\n    <tr>\n      <th colspan="4">Scoreboard</th>\n    </tr>\n    <tr>\n      <th>Rank</th>\n      <th colspan="2">Player</th>\n      <th>Wins</th>\n    </tr>\n  </thead>\n  <tbody>\n`

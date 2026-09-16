@@ -1,9 +1,17 @@
-import { BadRequestException, Body, Controller, Get, Headers, Post, Query, Render, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Headers, Post, Query, Render, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import State from './State';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
+import type { Response, Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { AuthGuard } from './guards/auth.guard';
+
+class PostLoginDto {
+  @IsString()
+  @IsNotEmpty()
+  token!: string
+}
 
 @Controller()
 export class AppController {
@@ -12,43 +20,53 @@ export class AppController {
     private readonly configService: ConfigService
   ) {}
 
-  @Get('config')
-  @Render('config')
-  config(
-    @Query('t') token: string
+  @Get('login')
+  @Render('login')
+  login() {}
+
+  @Post('config/login')
+  postConfigLogin(
+    @Body() body: PostLoginDto,
+    @Res({ passthrough: true }) res: Response,
   ) {
-    console.log('abc')
-    if(!token || this.configService.getOrThrow('GH_ACTION_TRUST') !== token) throw new BadRequestException()
-    console.log('abc', token)
-    return this.appService.config(token)
+    const { token } = body
+    if(this.configService.getOrThrow('API_AUTH_TOKEN') !== token) throw new BadRequestException()
+    res.cookie('auth_token', body.token, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    })
+  }
+
+  @Get('config')
+  @UseGuards(AuthGuard)
+  @Render('config')
+  config() {
+    return this.appService.config()
   }
 
   @Post('config')
+  @UseGuards(AuthGuard)
   async updateConfig(
-    @Headers('token') token: string,
-    @Body('config') config: string,
+    @Body('config') config: Record<string, any>,
   ) {
-    if(!token || this.configService.getOrThrow('GH_ACTION_TRUST') !== token) throw new BadRequestException()
-    await State.setConfig(JSON.parse(config))
+    await State.setConfig(config)
     return
   }
 
   @Get('config/export')
+  @UseGuards(AuthGuard)
   exportConfig(
-    @Query('t') token: string,
     @Res() res: Response,
   ) {
-    if(!token || this.configService.getOrThrow('GH_ACTION_TRUST') !== token) throw new BadRequestException()
     State.exportConfig(res)
   }
 
   @Post('config/import')
+  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async importConfig(
     @UploadedFile() file: any,
-    @Query('t') token: string,
   ) {
-    if(!token || this.configService.getOrThrow('GH_ACTION_TRUST') !== token) throw new BadRequestException()
     await State.importConfig(file)
   }
 

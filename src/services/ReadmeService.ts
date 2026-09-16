@@ -39,13 +39,13 @@ class ReadmeService {
 	}
 
 	async commitAndPush(commitMessage: string, readmeContent: string) {
-		const config = AppConfigService.getOrThrow('config')
+		const { owner, name, path } = State.getConfig('datas.repo')
 		const octokit = new Octokit({ auth: process.env.GH_TOKEN });
 
 		let sha: string | any = this.currentContentSha
 		if(!this.currentContentSha) {
 			sha = (await octokit.request(
-				`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`,
+				`GET /repos/${owner}/${name}/contents/${path}`,
 			)).data.sha;
 		}
 
@@ -56,7 +56,7 @@ class ReadmeService {
 			pushRespSha = await this.push(octokit, commitMessage, base64, sha)
 		} catch (e) {
 			this.currentContentSha = (
-				await octokit.request(`GET /repos/${config.datas.repo.owner}/${config.datas.repo.name}/contents/${config.datas.repo.readme.path}`)
+				await octokit.request(`GET /repos/${owner}/${name}/contents/${path}`)
 			).data.sha
 			pushRespSha = await this.push(octokit, commitMessage, base64, this.currentContentSha!)
 		}

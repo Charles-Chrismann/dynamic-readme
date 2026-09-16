@@ -5,6 +5,7 @@ import { Injectable, StreamableFile } from '@nestjs/common';
 import State from 'src/State';
 import { GbaDynamicModule } from 'src/modules';
 import { ReadmeService } from 'src/services';
+import { writeFile } from 'fs/promises';
 
 @Injectable()
 export class GbaService {
@@ -26,7 +27,7 @@ export class GbaService {
     return module.load(file.buffer)
   }
 
-  gif(id: string) {
+  async gif(id: string) {
     const module: GbaDynamicModule = State.modules.find(m => m.data['uuid'] === id) as GbaDynamicModule
     return new StreamableFile(Readable.from(module.gifBuffer));
   }

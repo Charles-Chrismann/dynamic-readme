@@ -45,13 +45,17 @@ export const ConfigSchema = z.object({
         disabled: z.boolean().optional(),
       }),
       z.object({
+        id: z.literal("static/separator"),
+        disabled: z.boolean().optional(),
+      }),
+      z.object({
         id: z.literal("static/greeting"),
         disabled: z.boolean().optional(),
       }),
       z.object({
         id: z.literal("static/profile-views"),
         data: z.object({
-          username: z.string()
+          login: z.string()
         }),
         disabled: z.boolean().optional(),
       }),
@@ -84,7 +88,9 @@ export const ConfigSchema = z.object({
       z.object({
         id: z.literal("static/socials"),
         options: z.object({
-          align: z.enum(["left", "right", "center"]),
+          align: z.enum(["left", "right", "center"]).optional(),
+        }).prefault({
+          align: "left"
         }),
         disabled: z.boolean().optional(),
       }),
@@ -95,19 +101,21 @@ export const ConfigSchema = z.object({
           title: z.string(),
         }),
         options: z.object({
-          scoreboard: z.boolean()
-        }),
+          scoreboard: z.boolean().default(false)
+        }).prefault({}),
         disabled: z.boolean().optional(),
       }),
       z.object({
         id: z.literal("dynamic/minesweeper"),
         data: z.object({
           uuid: z.string(),
-          title: z.string(),
-          reset: z.string(),
+          title: z.string().optional(),
+          reset: z.string().optional(),
         }),
         options: z.object({
-          gif: z.boolean()
+          gif: z.boolean().optional()
+        }).prefault({
+          gif: true
         }),
         disabled: z.boolean().optional(),
       }),
@@ -115,21 +123,25 @@ export const ConfigSchema = z.object({
         id: z.literal("dynamic/chess"),
         data: z.object({
           uuid: z.string(),
-          title: z.string(),
-          reset: z.string(),
+          title: z.string().default('A classic Chess'),
+          reset: z.string().default('Reset Game'),
         }),
         options: z.object({
-          reset: z.boolean()
-        }),
+          reset: z.boolean().default(true)
+        }).prefault({}),
         disabled: z.boolean().optional(),
       }),
       z.object({
         id: z.literal("dynamic/wordle"),
         data: z.object({
           title: z.string(),
+        }).prefault({
+          title: "A classic Wordle"
         }),
         options: z.object({
           scoreboard: z.boolean()
+        }).prefault({
+          scoreboard: true
         }),
         disabled: z.boolean().optional(),
       }),
@@ -148,9 +160,9 @@ export const ConfigSchema = z.object({
     repo: z.object({
       name: z.string(),
       owner: z.string(),
-      path: z.string()
+      path: z.string().default('README.md')
     }).optional(),
-    user: z.object({
+    user: z.looseObject({
       login: z.string(),
       firstname: z.string(),
       lastname: z.string(),
@@ -180,14 +192,10 @@ export const ConfigSchema = z.object({
             name: z.string(),
             url: z.string(),
             src: z.string(),
-            alt: z.string()
           })
         )
       })
     ).optional(),
-    "3rdParty": z.object({
-      views_count: z.url(),
-    }).optional()
   })
 })
 

@@ -31,7 +31,6 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
 
   public async init(): Promise<void> {
 
-    console.log(`./config/roms/${process.env.ROM_GBA_NAME}`)
     const rom = await readFile(`./config/roms/${process.env.ROM_GBA_NAME}`)
 
     this.gba_wrapper = new Wrapper({
@@ -47,6 +46,7 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     } catch (err: unknown) {
       this.logger.log('Starting gba module without save')
     }
+    this.gba_wrapper.switchUpdateMethod('manual')
 
     const frames = this.skipFrames(600, true)
     this.gifBuffer = await this.createGifBuffer(frames)
@@ -68,11 +68,9 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
     if(input < 0 || input > 9) return
     const frames = []
 
-
     for(let i = 0; i < 5; i++) {
       this.gba_wrapper.press(input, 1)
       this.gba_wrapper.frame()
-      frames.push(this.gba_wrapper.getPixels())
     }
     frames.push(...this.skipFrames(300, true))
     
@@ -97,12 +95,13 @@ export class GbaDynamicModule extends AbstractDynamicModule<Data, Options> {
       return
     }
     
-    const frames = []
+    const frames: number[][] = []
     for(let i = 0; i < n; i++) {
       if(i % 4 === 0) {
         this.gba_wrapper.setScreen()
         this.gba_wrapper.frame()
-        frames.push(this.gba_wrapper.getPixels())
+        const frame = this.gba_wrapper.getPixels()
+        frames.push(frame)
         this.gba_wrapper.removeScreen()
       }
       else this.gba_wrapper.frame()

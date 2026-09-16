@@ -20,16 +20,19 @@ import { MinesweeperDynamicModule } from './modules/dynamics/minesweeper.module'
 import { ChessDynamicModule } from './modules/dynamics/chess.module';
 import { RequestService } from './services';
 import {
-  mkdir,
+  readdir,
   readFile,
   rm,
   writeFile
 } from 'fs/promises';
-import { createReadStream, createWriteStream } from 'fs';
 import { Response } from 'express';
 import { ZipArchive } from 'archiver';
 import unzipper from 'unzipper';
 import { Readable } from 'stream';
+import { Logger } from '@nestjs/common';
+import { join } from 'path';
+import { Cron } from '@nestjs/schedule';
+import { SeparatorModule } from './modules/statics/separator.module';
 
 type ModuleConstructor<TData = any, TOptions = any> = new (data: TData, options?: TOptions) => AbstractModule<TData, TOptions>;
 
@@ -55,6 +58,7 @@ class State {
   public modules: AbstractModule[] = []
   public startRenderTimestamp!: number
   private config: Config | null = null
+  private logger = new Logger(State.name)
 
   async getConfigOrDefaultOrNull(): Promise<Config | null> {
     const [customConfig, defaultConfig] = await Promise.allSettled([
@@ -73,7 +77,10 @@ class State {
 
   async setConfig(unsafe_config: Record<string, any>) {
     const config = ConfigSchema.parse(unsafe_config)
-    await writeFile(`./config/datas/config.json`, JSON.stringify(config))
+
+    this.logger.log(`Setting new config: ${JSON.stringify(config)}`)
+
+    await writeFile(`./config/datas/config.json`, JSON.stringify(config, null, 2))
     await this.init(config)
   }
 
@@ -94,6 +101,7 @@ class State {
       ["static/socials", SocialsStaticModule],
       ["static/skills", SkillsStaticModule],
       ["static/trigger", TriggerStaticModule],
+      ["static/separator", SeparatorModule],
       ["dynamic/gba", GbaDynamicModule],
       ["dynamic/followers", FollowersDynamicModule],
       ["dynamic/generated", GeneratedDynamicModule],
@@ -129,7 +137,6 @@ class State {
       this.modules.push(createdModule)
     }
     await Promise.all(moduleInitPromises)
-    console.log(this.config)
   }
 
   async render() {
@@ -205,7 +212,18 @@ class State {
   }
 
   async importConfig(file: any) {
-    await rm(`./config`, { recursive: true })
+    
+    const directory = './config';
+    const entries = await readdir(directory);
+
+    await Promise.all(
+      entries.map((entry) =>
+        rm(join(directory, entry), {
+          recursive: true,
+          force: true,
+        }),
+      ),
+    );
 
     await Readable.from(file.buffer)
       .pipe(unzipper.Extract({ path: `./` }))
@@ -216,6 +234,107 @@ class State {
     if(config) {
       await this.init(config)
     }
+  }
+
+  @Cron('0 0 0 * * *')
+  async backupData() {
+
+    const {
+      BU_DISCORD_CHANNEL_ID,
+      BU_DISCORD_TOKEN,
+    } = process.env
+
+    if(
+      !BU_DISCORD_CHANNEL_ID
+      || !BU_DISCORD_TOKEN
+    ) {
+      this.logger.log(`Incomplete discord backup configuration, skipping backp!`)
+      return
+    }
+    
+    const archive = new ZipArchive({
+      zlib: { level: 9 },
+    });
+    const chunks: Buffer[] = [];
+
+    archive.on('data', (chunk: Buffer) => {
+      chunks.push(chunk);
+    });
+
+    archive.directory('./config/datas', false);
+
+    await archive.finalize();
+
+    const buffer = Buffer.concat(chunks);
+
+    const filename = 'datas.zip'
+    const original_content_type = "application/zip"
+    const file = new File(
+      [buffer],
+      filename,
+      {
+        type: 'application/zip',
+      },
+    );
+    
+    const attachmentsRes = await fetch(`https://discord.com/api/v9/channels/${BU_DISCORD_CHANNEL_ID}/attachments`, {
+      method: 'POST',
+      headers: {
+        authorization: BU_DISCORD_TOKEN,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        files:[{
+          filename:"config.zip",
+          file_size:file.size,
+          id:"6",
+          is_clip:false,
+          original_content_type:"application/zip"
+        }]
+      })
+    })
+
+    const attachmentsData: {
+      attachments: {
+        id: number
+        upload_url: string
+        upload_filename: string
+      }[]
+    } = await attachmentsRes.json()
+
+    const { upload_url, upload_filename } = attachmentsData.attachments[0]
+
+    await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        authorization: BU_DISCORD_TOKEN,
+        'content-type': 'application/octet-stream',
+        'content-length': buffer.length.toString(),
+      },
+      body: buffer
+    })
+    
+    await fetch(`https://discord.com/api/v9/channels/${BU_DISCORD_CHANNEL_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        authorization: BU_DISCORD_TOKEN,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        attachments: [{
+          filename,
+          id: "0",
+          original_content_type,
+          uploaded_filename: upload_filename,
+        }],
+        mobile_network_type:"unknown",
+        content:"",
+        tts:false,
+        flags:0
+      })
+    })
+
+    this.logger.log(`Successfully saving ./config/datas on discord`)
   }
 }
 

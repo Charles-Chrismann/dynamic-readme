@@ -19,13 +19,11 @@ export class AppService {
 </html>`
   }
 
-  config(token: string) {
+  config() {
     const config = State.getConfig()
     const configStr = JSON.stringify(config, null, 2)
-    console.log(configStr)
     return {
       configStr,
-      token,
     }
   }
 }

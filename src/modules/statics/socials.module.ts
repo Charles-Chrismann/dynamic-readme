@@ -15,7 +15,7 @@ export class SocialsStaticModule extends AbstractStaticModule<Data, Options> {
     const socials = State.getConfig('datas.user.socials');
     
     const socialsStr = socials.map((social) => {
-      return `  <a href="${social.profile_url}" target="blank">\n    <img align="center" src="${social.icon_url}" alt="${social.name}" height="40" width="40" />\n  </a>\n`;
+      return `  <a href="${social.profile_url}" target="blank"><img align="center" src="${social.icon_url}" alt="${social.name}" height="40" width="40" /></a>\n`;
     }).join('');
 
     return `<h1 align="left">Reach Me</h1>\n<p align="${this.options.align ?? "left"}">\n${socialsStr}</p>\n`;

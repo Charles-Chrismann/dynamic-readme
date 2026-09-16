@@ -48,7 +48,7 @@ export class GbaController {
   }
 
   @Get('/:id/gif')
-  @Header('Cache-Control', 'public, max-age=0')
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
   @Header('Content-Type', 'image/gif')
   gif(
     @Param('id') id: string
