@@ -9,6 +9,10 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import { minesweeperSchema } from "src/zod.zodobject";
 import type { Minesweeper as MinesweeperType } from '../../zod.zodobject'
 
+function isNodeError(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && "code" in error;
+}
+
 interface Data {
   uuid: string
 }
@@ -18,7 +22,7 @@ interface Options {
 
 export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Options> {
 
-  minesweeper!: Minesweeper
+  minesweeper!: Minesweeper 
   frames: Uint8ClampedArray<ArrayBufferLike>[] = []
   gifBuffer: Buffer | null = null
 
@@ -44,8 +48,13 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
       this.generatehistoryGif()
 
     } catch (err: unknown) {
-      this.new()
-      await this.save()
+      if(
+        isNodeError(err)
+        && err.code === 'ENOENT'
+      ) {
+        this.logger.log(`Save in ./config/datas/minesweeper/${this.data['uuid']}.json not found, stating a new game.`)
+        this.new()
+      }
     }
   }
 
@@ -67,6 +76,7 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
 
   async new() {
     this.minesweeper = new Minesweeper().init({ width: 18, height: 14, bombsCount: 24 })
+    this.frames = []
 
     const tileSize = 16;
     const width = tileSize * this.minesweeper.width;
@@ -92,7 +102,8 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
     if(!this.minesweeper.handleClick({x: x, y: y})) return false
     this.minesweeper.history.push([x, y])
     if(this.minesweeper.map.flat().filter(cell => cell.hidden).length === this.minesweeper.bombsCount) this.minesweeper.gameStatus = "Ended"
-    await this.renderGameImageCtx(this.minesweeper)
+    const img = await this.renderGameImageCtx(this.minesweeper)
+    this.frames.push(img)
     await this.save()
     this.needsRender = true
     this.generatehistoryGif()
@@ -110,8 +121,8 @@ export class MinesweeperDynamicModule extends AbstractDynamicModule<Data, Option
 
     const emojis: Record<string, Image> = {}
     const emojiList = ["one", "two", "three", "four", "five", "six", "seven", "eight", "boom"]
-    for(let i = 0; i < width; i++) {
-      for(let j = 0; j < height; j++) {
+    for(let i = 0; i < minesweeperData.width; i++) {
+      for(let j = 0; j < minesweeperData.height; j++) {
         const cell = minesweeperData.map[j][i]
         if(cell.hidden) continue
         if(!cell.value) {
