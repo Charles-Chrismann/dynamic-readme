@@ -20,6 +20,7 @@ import { MinesweeperDynamicModule } from './modules/dynamics/minesweeper.module'
 import { ChessDynamicModule } from './modules/dynamics/chess.module';
 import { RequestService } from './services';
 import {
+  mkdir,
   readdir,
   readFile,
   rm,
@@ -29,10 +30,11 @@ import { Response } from 'express';
 import { ZipArchive } from 'archiver';
 import unzipper from 'unzipper';
 import { Readable } from 'stream';
-import { Logger } from '@nestjs/common';
-import { join } from 'path';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { dirname, join } from 'path';
 import { Cron } from '@nestjs/schedule';
 import { SeparatorModule } from './modules/statics/separator.module';
+import { CronJob } from 'cron';
 
 type ModuleConstructor<TData = any, TOptions = any> = new (data: TData, options?: TOptions) => AbstractModule<TData, TOptions>;
 
@@ -59,6 +61,7 @@ class State {
   public startRenderTimestamp!: number
   private config: Config | null = null
   private logger = new Logger(State.name)
+  private backupCron = new CronJob('0 0 0 * * *', () => this.backupData(), null, true)
 
   async getConfigOrDefaultOrNull(): Promise<Config | null> {
     const [customConfig, defaultConfig] = await Promise.allSettled([
@@ -211,32 +214,77 @@ class State {
     await archive.finalize();
   }
 
-  async importConfig(file: any) {
-    
+  async importConfig(file: Express.Multer.File) {
     const directory = './config';
-    const entries = await readdir(directory);
 
-    await Promise.all(
-      entries.map((entry) =>
-        rm(join(directory, entry), {
-          recursive: true,
-          force: true,
-        }),
-      ),
+    const zip = await unzipper.Open.buffer(file.buffer);
+  
+    // Recherche du dossier datas/
+    const datasEntry = zip.files.find(
+      (entry) =>
+        entry.type === 'Directory' &&
+        entry.path.split('/').filter(Boolean).at(-1) === 'datas',
+    );
+  
+    if (!datasEntry) {
+      throw new BadRequestException(
+        'The archive does not contain a datas directory',
+      );
+    }
+  
+    // "foo/bar/datas/" -> "foo/bar/"
+    const rootPath = datasEntry.path.slice(
+      0,
+      datasEntry.path.length - 'datas/'.length,
     );
 
-    await Readable.from(file.buffer)
-      .pipe(unzipper.Extract({ path: '.' }))
-      .promise();
-
-    const config = await this.getConfigOrDefaultOrNull()
-    
-    if(config) {
-      await this.init(config)
+    const files = new Map<string, Buffer>();
+  
+    for (const entry of zip.files) {
+      if (
+        entry.type !== 'File' ||
+        !entry.path.startsWith(rootPath)
+      ) {
+        continue;
+      }
+  
+      const relativePath = entry.path.slice(rootPath.length);
+  
+      if (!relativePath) {
+        continue;
+      }
+  
+      files.set(relativePath, await entry.buffer());
     }
+  
+    await rm(directory, {
+      recursive: true,
+      force: true,
+    });
+  
+    await mkdir(directory, {
+      recursive: true,
+    });
+  
+    for (const [relativePath, content] of files) {
+      const destination = join(directory, relativePath);
+  
+      await mkdir(dirname(destination), {
+        recursive: true,
+      });
+  
+      await writeFile(destination, content);
+    }
+  
+    const config = await this.getConfigOrDefaultOrNull();
+  
+    if (config) {
+      await this.init(config);
+    }
+
+    this.logger.log(`Config successfully imported`)
   }
 
-  @Cron('0 0 0 * * *')
   async backupData() {
 
     const {

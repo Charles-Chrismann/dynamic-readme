@@ -65,7 +65,7 @@ export class AppController {
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async importConfig(
-    @UploadedFile() file: any,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     await State.importConfig(file)
   }
