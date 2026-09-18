@@ -74,7 +74,9 @@ class ReadmeService {
 		await this.renderCommitAndPush(commitMessage)
 
 		const { owner, name } = State.getConfig('datas.repo')
-		const url = `https://github.com/${owner}/${name}`
+		const url = owner.toLowerCase() === name.toLowerCase()
+		? `https://github.com/${owner}`
+		: `https://github.com/${owner}/${name}`
 		if(AppConfigService.getOrThrow('NODE_ENV') === "production") res.redirect(url + redirectUrlFragment)
 		else res.redirect(`${AppConfigService.APP_BASE_URL}/render${redirectUrlFragment}`)
 	}

@@ -12,9 +12,9 @@ This project takes a different approach by creating a new commit on the reposito
 - 💭 [Philosophy](#-philosophy)
 - 🏗️ [Project Structure](#%EF%B8%8F-project-structure)
 - 🛠️ [Installation](#%EF%B8%8F-installation)
-- 📝 [To Do](#-to-do)
 - ✨ [Contributing](#-contributing)
 - ⚖️ [License](#%EF%B8%8F-license)
+- 📝 [To Do](#-to-do)
 
 </details>
 
@@ -34,9 +34,9 @@ The core files and folders of the app are as follows:
 - **`src/services/ReadmeService.ts`**: a utility class used to interact with GitHub. Most of the time, you’ll want to call `ReadmeService.updateReadmeAndRedirect()`. (Use `ReadmeService.doNothingAndRedirect()` if there are no changes to apply.)  
 - **`src/services/RequestService.ts`**: a utility class used to interact with the GitHub REST and GraphQL APIs.
 
-A module can extend either the **AbstractStaticModule**, which means it is not likely to change — for example, an “About Me” section.
+A module can extend either the **AbstractStaticModule**, which means it is not likely to change, for example, an “About Me” section.
 
-A module can also extend the **AbstractDynamicModule**, which means it will change over time — for example, a chess game or a “Latest Followers” section.
+A module can also extend the **AbstractDynamicModule**, which means it will change over time, for example, a chess game or a “Latest Followers” section.
 
 The workflow in all modules/games follows the same pattern:
 
@@ -53,91 +53,74 @@ This results in a seemingly simple page refresh for the user.
 
 ## 🛠️ Installation
 
+In order to make the app work, 3 places needs setup:
+- [`VPS installation`](#vps-installation): Your code needs to run somewhere
+- [`Domain name`](#domain-name): Make your app works under domain name (the app might works under IP adressn not tested)
+- [`Github repository`](#domain-name): Some modules such as the wordle module takes adventage of github actions/images stored in the assets folder
+
+### VPS installation
+
+The easiest way to develop/deploy is through Docker
+
 Requirements:
-  - Docker
-  - Node & NPM
+  - Docker (obviously)
 
 Steps:
 1. git clone https://github.com/Charles-Chrismann/dynamic-readme
 2. dupe .env.example and rename it .env, fill variables
-3. dupe config.example.json and rename it config.json, fill variables
-
-> [!NOTE]
-> Some modules like the Gba module might required additional setup
-
-<details>
-  <summary>👨‍💻 Developpement</summary>
-
-```sh
-npm run dev
+3. build image:
+```
+docker build -t dynamic-readme .
+```
+4. run image:
+```
+docker run --env-file .env dynamic-readme -p 3000:3000
 ```
 
-equivalent to: `docker compose -f docker-compose.dev.yml up --watch`
+### Domain name
 
-> you might need to trigger the hot reload to get the latest version of the app.
+Create a domain/sub domain name poiting to your application
 
-</details>
+### Github repository
 
-<details>
-  <summary>🚀 Production</summary>
+1. Create files
 
-```sh
-npm run prod
-```
+To setup the dynamic github repository, you can juste copy the content of the `to-copy/` folder in the root of the target repository.
 
-equivalent to: `docker compose -f docker-compose.prod.yml up --build -d`
-
-</details>
-
-<details>
-  <summary>📂 Utility commands</summary>
-
-delet all volumes
-
-```sh
-docker compose -f docker-compose.dev.yml --env-file .env.dev down -v
-```
-
-docker system df
-docker builder prune
-
-redis cli
+The final repository structure should look like this.
 
 ```
-redis-cli -h localhost -p 6379
-KEYS *
+/
+├── .github/
+│   └── workflows/
+│       └── wordle.yml
+├── assets/
+│   └── gba/
+│       ├── bottom-top-right.png
+│       └── ...
+└── README.md
 ```
 
-Backup
+2. Define environment secrets & variables
 
-```sh
-docker exec dr-prod-redis redis-cli save
-docker cp dr-prod-redis:/data/dump.rdb ./dump.rdb
-```
+The secrets and variables can be define at the adress https://github.com/owner-name/owner-name/settings/secrets/actions
 
-Restore
+Secrets to set:
+- `API_AUTH_TOKEN`
+- `GH_TOKEN`
 
-```sh
-docker cp ./dump.rdb dr-prod-redis:/data/dump.rdb
-docker restart dr-prod-redis
-```
-
-If docker seems to use an old versin of the code
-
-```sh
-docker compose -f docker-compose.dev.yml --env-file .env.dev down --volumes --remove-orphans
-docker compose -f docker-compose.dev.yml --env-file .env.dev build --no-cache
-```
-
-</details>
+Variables to set:
+- `APP_BASE_URL`
 
 ## ✨ Contributing
 
-Contributions are welcome!  
+Contributions are welcome!
 If you want to improve the project, fix a bug, or add a new feature, feel free to open a pull request or submit an issue.
 
 Before contributing, please make sure your code is clean, consistent, and well-documented.  
-Try to follow the existing project structure and naming conventions to keep everything coherent.
+Try as much as possible to follow the existing project structure and naming conventions to keep everything coherent.
+
+No pressure, if you take a look at the code you will find a lot of dead/commented code, all contributions are welcome!
 
 ## ⚖️ License
 
