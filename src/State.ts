@@ -29,10 +29,8 @@ import {
 import { Response } from 'express';
 import { ZipArchive } from 'archiver';
 import unzipper from 'unzipper';
-import { Readable } from 'stream';
 import { BadRequestException, Logger } from '@nestjs/common';
 import { dirname, join } from 'path';
-import { Cron } from '@nestjs/schedule';
 import { SeparatorModule } from './modules/statics/separator.module';
 import { CronJob } from 'cron';
 
