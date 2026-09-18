@@ -257,14 +257,16 @@ class State {
       files.set(relativePath, await entry.buffer());
     }
   
-    await rm(directory, {
-      recursive: true,
-      force: true,
-    });
-  
-    await mkdir(directory, {
-      recursive: true,
-    });
+    const entries = await readdir(directory);
+
+    await Promise.all(
+      entries.map((entry) =>
+        rm(join(directory, entry), {
+          recursive: true,
+          force: true,
+        }),
+      ),
+    );
   
     for (const [relativePath, content] of files) {
       const destination = join(directory, relativePath);
