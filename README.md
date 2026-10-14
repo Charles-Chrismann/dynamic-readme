@@ -107,7 +107,12 @@ The secrets and variables can be define at the adress https://github.com/owner-n
 
 Secrets to set:
 - `API_AUTH_TOKEN`
-- `GH_TOKEN`
+- `GH_TOKEN`: : only select-repositories => selec
+
+> For GH_TOKEN:
+> 1. go to [https://github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
+> 2. Repository access > Only select repositories > select the target repository
+> 3. Permissions > Repositories > Issues: Read and write + Content: Read and write
 
 Variables to set:
 - `APP_BASE_URL`
